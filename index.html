@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Track your expenses with a two-ledger account system. Manage HDFC, SBI, and Wallet accounts with real-time balance updates." />
+    <meta name="theme-color" content="#000000" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <title>Expense Tracker — Two Ledger System</title>
+    <style>
+      #splash-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #000000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        transition: opacity 0.4s ease, visibility 0.4s ease;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      .splash-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+        text-align: center;
+      }
+      .splash-logo {
+        width: 72px;
+        height: 72px;
+        background: #ffffff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 42px;
+        font-weight: 900;
+        color: #000000;
+        box-shadow: 0 8px 32px rgba(255, 255, 255, 0.08);
+        animation: splashPulse 2s infinite ease-in-out;
+      }
+      .splash-title {
+        color: #ffffff;
+        font-size: 1.35rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+      .splash-loader {
+        width: 64px;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+        position: relative;
+      }
+      .splash-bar {
+        width: 40%;
+        height: 100%;
+        background: #ffffff;
+        position: absolute;
+        left: -40%;
+        animation: splashLoad 1.2s infinite linear;
+      }
+      .splash-screen--fade-out {
+        opacity: 0;
+        visibility: hidden;
+      }
+      @keyframes splashPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.06); box-shadow: 0 12px 40px rgba(255, 255, 255, 0.15); }
+      }
+      @keyframes splashLoad {
+        0% { left: -40%; }
+        100% { left: 100%; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="splash-screen">
+      <div class="splash-content">
+        <div class="splash-logo">₹</div>
+        <h1 class="splash-title">Expense Tracker Ledger</h1>
+        <div class="splash-loader">
+          <div class="splash-bar"></div>
+        </div>
+      </div>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
