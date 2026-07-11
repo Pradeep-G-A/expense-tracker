@@ -8,10 +8,3 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>
 );
-
-// Dismiss loading splash screen once React mounts
-const splash = document.getElementById('splash-screen');
-if (splash) {
-  splash.classList.add('splash-screen--fade-out');
-  setTimeout(() => splash.remove(), 400);
-}

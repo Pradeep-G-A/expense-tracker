@@ -82,6 +82,19 @@
         100% { left: 100%; }
       }
     </style>
+    <script>
+      // Fallback: If React fails to load or database hangs, fade out the splash screen after 4 seconds
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          const splash = document.getElementById('splash-screen');
+          if (splash && !splash.classList.contains('splash-screen--fade-out')) {
+            console.warn('Splash screen dismissed by timeout fallback.');
+            splash.classList.add('splash-screen--fade-out');
+            setTimeout(() => splash.remove(), 400);
+          }
+        }, 4000);
+      });
+    </script>
   </head>
   <body>
     <div id="splash-screen">

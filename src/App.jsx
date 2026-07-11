@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { useAuth } from './hooks/useAuth';
 import { useTransactions } from './hooks/useTransactions';
@@ -183,6 +183,15 @@ function AppContent() {
 }
 
 export default function App() {
+  useEffect(() => {
+    const splash = document.getElementById('splash-screen');
+    if (splash) {
+      splash.classList.add('splash-screen--fade-out');
+      const timer = setTimeout(() => splash.remove(), 400);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   return (
     <ThemeProvider>
       <AppContent />
