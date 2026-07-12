@@ -9,7 +9,7 @@ const ACCOUNT_ICONS = {
 };
 
 export default function AccountCards({ accounts, loading, txnLoading, activeLedger, transactions }) {
-  const { totalBalance, todaySpend, yesterdaySpend } = useMemo(() => {
+  const { totalBalance, todaySpend, yesterdaySpend, totalLent } = useMemo(() => {
     let totalBal = 0;
     if (!txnLoading) {
       accounts.forEach(acc => {
@@ -34,6 +34,7 @@ export default function AccountCards({ accounts, loading, txnLoading, activeLedg
 
     let tSpend = 0;
     let ySpend = 0;
+    let tLent = 0;
 
     if (!txnLoading) {
       (transactions || []).forEach(t => {
@@ -41,16 +42,24 @@ export default function AccountCards({ accounts, loading, txnLoading, activeLedg
           if (t.date === todayStr) tSpend += Math.abs(t.amount);
           if (t.date === yesterdayStr) ySpend += Math.abs(t.amount);
         }
+        
+        // Calculate outstanding lent amount: 
+        // - Lending money is logged as an expense (negative amount, e.g. -1000)
+        // - Returning money is logged as income (positive amount, e.g. +400)
+        // Outstanding = -1 * Sum(amounts)
+        if (t.category === 'Lent') {
+          tLent -= Number(t.amount || 0);
+        }
       });
     }
 
-    return { totalBalance: totalBal, todaySpend: tSpend, yesterdaySpend: ySpend };
+    return { totalBalance: totalBal, todaySpend: tSpend, yesterdaySpend: ySpend, totalLent: tLent };
   }, [accounts, activeLedger, transactions, txnLoading]);
 
   if (loading) {
     return (
       <div className="dashboard-modules">
-        {[1, 2, 3].map(i => (
+        {[1, 2, 3, 4].map(i => (
           <div key={i} className="dashboard-module dashboard-module--skeleton">
             <div className="skeleton-line skeleton-line--sm" />
             <div className="skeleton-line skeleton-line--lg" />
@@ -112,6 +121,19 @@ export default function AccountCards({ accounts, loading, txnLoading, activeLedg
               {formatCurrency(yesterdaySpend)}
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* Module 4: Lent & Receivables */}
+      <div className="dashboard-module">
+        <h3 className="dashboard-module__title">Lent & Receivables</h3>
+        <div className="dashboard-module__content dashboard-module__content--center">
+          <span className={`dashboard-module__main-value ${totalLent > 0 ? 'text-positive' : (totalLent < 0 ? 'text-negative' : '')}`}>
+            {formatCurrency(totalLent)}
+          </span>
+          <span className="dashboard-module__subtitle">
+            {totalLent > 0 ? 'To be received' : (totalLent < 0 ? 'You owe others' : 'All settled')}
+          </span>
         </div>
       </div>
     </div>

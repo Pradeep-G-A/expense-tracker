@@ -8,6 +8,7 @@ export const CATEGORIES = [
   'Recharge',
   'Transfers',
   'Salary',
+  'Lent',
   'Other',
 ];
 
