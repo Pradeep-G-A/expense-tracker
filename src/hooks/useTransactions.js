@@ -51,6 +51,7 @@ export function useTransactions() {
         category: transaction.category,
         account: transaction.account,
         date: transaction.date,
+        time: transaction.time || null,
         note: transaction.note || null,
         sort_order: maxSortOrder + 1,
       })
@@ -62,7 +63,8 @@ export function useTransactions() {
       throw error;
     }
 
-    setTransactions(prev => [...prev, data]);
+    // Re-fetch to get properly sorted data
+    await fetchTransactions();
     return data;
   };
 
@@ -84,9 +86,8 @@ export function useTransactions() {
       throw error;
     }
 
-    setTransactions(prev =>
-      prev.map(t => (t.id === id ? data : t))
-    );
+    // Re-fetch to get properly sorted data (in case date/time changed)
+    await fetchTransactions();
     return data;
   };
 
@@ -101,7 +102,8 @@ export function useTransactions() {
       throw error;
     }
 
-    setTransactions(prev => prev.filter(t => t.id !== id));
+    // Re-fetch to ensure consistent state
+    await fetchTransactions();
   };
 
   const reorderTransactions = async (activeId, overId) => {
