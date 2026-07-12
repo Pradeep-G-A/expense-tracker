@@ -8,13 +8,15 @@ const ACCOUNT_ICONS = {
   Wallet: WalletCards,
 };
 
-export default function AccountCards({ accounts, loading, activeLedger, transactions }) {
+export default function AccountCards({ accounts, loading, txnLoading, activeLedger, transactions }) {
   const { totalBalance, todaySpend, yesterdaySpend } = useMemo(() => {
     let totalBal = 0;
-    accounts.forEach(acc => {
-      const bal = activeLedger === 1 ? acc.current_balance_1 : acc.current_balance_2;
-      totalBal += bal;
-    });
+    if (!txnLoading) {
+      accounts.forEach(acc => {
+        const bal = activeLedger === 1 ? acc.current_balance_1 : acc.current_balance_2;
+        totalBal += bal;
+      });
+    }
 
     // Calculate dates
     const today = new Date();
@@ -33,15 +35,17 @@ export default function AccountCards({ accounts, loading, activeLedger, transact
     let tSpend = 0;
     let ySpend = 0;
 
-    (transactions || []).forEach(t => {
-      if (t.amount < 0) { // Expense
-        if (t.date === todayStr) tSpend += Math.abs(t.amount);
-        if (t.date === yesterdayStr) ySpend += Math.abs(t.amount);
-      }
-    });
+    if (!txnLoading) {
+      (transactions || []).forEach(t => {
+        if (t.amount < 0) { // Expense
+          if (t.date === todayStr) tSpend += Math.abs(t.amount);
+          if (t.date === yesterdayStr) ySpend += Math.abs(t.amount);
+        }
+      });
+    }
 
     return { totalBalance: totalBal, todaySpend: tSpend, yesterdaySpend: ySpend };
-  }, [accounts, activeLedger, transactions]);
+  }, [accounts, activeLedger, transactions, txnLoading]);
 
   if (loading) {
     return (
@@ -74,7 +78,7 @@ export default function AccountCards({ accounts, loading, activeLedger, transact
         <h3 className="dashboard-module__title">Account Breakdown</h3>
         <div className="dashboard-module__list">
           {accounts.map(account => {
-            const currentBalance = activeLedger === 1 ? account.current_balance_1 : account.current_balance_2;
+            const currentBalance = txnLoading ? 0 : (activeLedger === 1 ? account.current_balance_1 : account.current_balance_2);
             const Icon = ACCOUNT_ICONS[account.name] || Wallet;
             
             return (

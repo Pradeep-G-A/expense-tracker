@@ -145,7 +145,7 @@ function AppContent() {
 
         {activeTab === 'transactions' ? (
           <>
-            <AccountCards accounts={accounts} loading={accLoading} activeLedger={activeLedger} transactions={transactions} />
+            <AccountCards accounts={accounts} loading={accLoading} txnLoading={txnLoading} activeLedger={activeLedger} transactions={transactions} />
             <TransactionForm accounts={accounts} onAdd={handleAdd} />
             <FilterBar
               accounts={accounts}
