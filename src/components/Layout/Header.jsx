@@ -1,4 +1,4 @@
-import { Wallet, LogOut } from 'lucide-react';
+import { Wallet, LogOut, RefreshCw } from 'lucide-react';
 import ThemeToggle from '../common/ThemeToggle';
 
 export default function Header({ user, onSignOut, activeLedger, onToggleLedger }) {
@@ -25,6 +25,13 @@ export default function Header({ user, onSignOut, activeLedger, onToggleLedger }
             Ledger 2
           </button>
         </div>
+        <button 
+          className="btn btn--ghost btn--sm header__refresh-btn" 
+          onClick={() => window.location.reload()} 
+          title="Refresh Page"
+        >
+          <RefreshCw size={18} />
+        </button>
         <ThemeToggle />
         {user && (
           <div className="header__user">

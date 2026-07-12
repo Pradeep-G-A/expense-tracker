@@ -358,10 +358,13 @@ export default function TransactionForm({ accounts, onAdd }) {
             {submitting ? (
               <span className="spinner" />
             ) : (
-              <>
-                <Send size={16} />
-                Save {isExpense ? 'Expense' : 'Income'} <span className="btn-key-tip">[Ctrl+Enter]</span>
-              </>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
+                  <Send size={16} />
+                  <span>Save {isExpense ? 'Expense' : 'Income'}</span>
+                </div>
+                <span className="btn-key-tip" style={{ fontSize: '0.68rem', opacity: 0.8, color: 'inherit' }}>[Ctrl+Enter]</span>
+              </div>
             )}
           </button>
           
