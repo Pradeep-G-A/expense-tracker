@@ -20,7 +20,7 @@ export default function TransactionRow({
         </span>
       </td>
       <td className="td--note" data-label="Note">{transaction.note || '—'}</td>
-      <td className={`td--balance ${runningBalance != null && runningBalance >= 0 ? 'text-positive' : 'text-negative'}`} data-label="Net Balance">
+      <td className="td--balance" data-label="Net Balance">
         {runningBalance != null ? `${transaction.account}: ${formatCurrency(runningBalance)}` : '—'}
       </td>
       <td className="td--actions" data-label="Actions">

@@ -10,7 +10,7 @@ export default function TransactionForm({ accounts, onAdd }) {
   const [form, setForm] = useState({
     amount: '',
     category: CATEGORIES[0],
-    account: '',
+    account: 'HDFC',
     date: getTodayStr(),
     time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
     note: '',
@@ -98,7 +98,6 @@ export default function TransactionForm({ accounts, onAdd }) {
               onChange={e => handleChange('account', e.target.value)}
               required
             >
-              <option value="" disabled>Select account</option>
               {accountNames.map(name => (
                 <option key={name} value={name}>{name}</option>
               ))}
