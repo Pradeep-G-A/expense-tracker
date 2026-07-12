@@ -1,4 +1,4 @@
-import { Wallet, LogOut, RefreshCw } from 'lucide-react';
+import { IndianRupee, LogOut, RefreshCw } from 'lucide-react';
 import ThemeToggle from '../common/ThemeToggle';
 
 export default function Header({ user, onSignOut, activeLedger, onToggleLedger }) {
@@ -6,7 +6,7 @@ export default function Header({ user, onSignOut, activeLedger, onToggleLedger }
     <header className="header">
       <div className="header__left">
         <div className="header__logo">
-          <Wallet size={24} />
+          <IndianRupee size={24} />
         </div>
         <h1 className="header__title">Expense Tracker</h1>
       </div>

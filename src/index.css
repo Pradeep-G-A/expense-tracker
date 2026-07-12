@@ -1402,6 +1402,29 @@ body {
 @media (max-width: 640px) {
   .main { padding: 16px 12px 40px; }
 
+  /* Premium Mobile Carousel for Dashboard Metrics */
+  .dashboard-modules {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    gap: 12px;
+    padding: 0 12px 16px 12px; /* Padding for scroll overflow */
+    margin: 0 -12px; /* Negative margin pulls container to screen edges */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .dashboard-modules::-webkit-scrollbar {
+    display: none;
+  }
+  .dashboard-module {
+    flex: 0 0 85%; /* Take up 85% of screen width */
+    scroll-snap-align: center;
+  }
+
+
   .transaction-form__fields {
     grid-template-columns: 1fr;
   }
@@ -1444,16 +1467,41 @@ body {
 
   .header { 
     padding: 6px 12px; 
+    height: 52px;
   }
   .header__logo {
-    display: none;
+    display: flex !important;
+    width: auto;
+    height: auto;
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--primary);
   }
   .header__title { 
-    font-size: 0.95rem; 
+    display: none !important; 
+  }
+  .header__right {
+    gap: 4px;
+  }
+  .header .btn--ghost {
+    border: none;
+    background: transparent;
+    padding: 6px;
+  }
+  .header .theme-toggle__track {
+    border-radius: 9999px;
+  }
+  .header .theme-toggle__thumb {
+    border-radius: 9999px;
+  }
+  .ledger-toggle-wrapper {
+    border-radius: 0;
   }
   .ledger-toggle-btn {
     padding: 4px 8px;
     font-size: 0.7rem;
+    border-radius: 0;
   }
   .form-submit-row {
     flex-direction: column;
