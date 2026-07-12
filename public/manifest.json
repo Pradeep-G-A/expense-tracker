@@ -1,6 +1,6 @@
 {
-  "short_name": "Ledger Tracker",
-  "name": "Expense Tracker Ledger",
+  "short_name": "Expense Tracker",
+  "name": "Expense Tracker",
   "icons": [
     {
       "src": "/favicon.svg",
