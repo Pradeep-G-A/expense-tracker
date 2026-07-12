@@ -10,6 +10,7 @@ import TransactionForm from './components/Transactions/TransactionForm';
 import TransactionTable from './components/Transactions/TransactionTable';
 import StatisticsView from './components/Statistics/StatisticsView';
 import FilterBar from './components/Transactions/FilterBar';
+import SavingsGoalsView from './components/Goals/SavingsGoalsView';
 import Toast from './components/common/Toast';
 
 function AppContent() {
@@ -17,6 +18,8 @@ function AppContent() {
   const {
     transactions,
     loading: txnLoading,
+    isOnline,
+    syncing,
     addTransaction,
     updateTransaction,
     deleteTransaction,
@@ -34,6 +37,55 @@ function AppContent() {
     dateTo: '',
     search: '',
   });
+
+  // Global Keyboard Shortcuts
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      // Check if an input field is currently focused
+      const activeEl = document.activeElement;
+      const isInputActive = activeEl && (
+        activeEl.tagName === 'INPUT' || 
+        activeEl.tagName === 'SELECT' || 
+        activeEl.tagName === 'TEXTAREA' || 
+        activeEl.isContentEditable
+      );
+
+      // 1. Tab Switching (Alt + 1 / Alt + 2 / Alt + 3)
+      if (e.altKey && (e.key === '1' || e.key === '2' || e.key === '3')) {
+        e.preventDefault();
+        if (e.key === '1') setActiveTab('transactions');
+        if (e.key === '2') setActiveTab('statistics');
+        if (e.key === '3') setActiveTab('goals');
+        return;
+      }
+
+      // If typing in an input, don't trigger general shortcuts (N, F)
+      if (isInputActive) return;
+
+      // 2. Focus Amount (N)
+      if (e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        setActiveTab('transactions');
+        // Give a tiny timeout for tab state to flush, then dispatch focus
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('focus-amount'));
+        }, 50);
+      }
+
+      // 3. Focus Search (F)
+      if (e.key.toLowerCase() === 'f') {
+        e.preventDefault();
+        setActiveTab('transactions');
+        // Give a tiny timeout for tab state to flush, then dispatch focus
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('focus-search'));
+        }, 50);
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
 
   const filteredTransactions = useMemo(() => {
     let result = [...transactions];
@@ -127,23 +179,45 @@ function AppContent() {
         onToggleLedger={() => setActiveLedger(prev => prev === 1 ? 2 : 1)} 
       />
 
+      {!isOnline && (
+        <div className="offline-banner">
+          <span>Offline Mode: New transactions are saved locally and will auto-sync when online.</span>
+        </div>
+      )}
+
+      {syncing && (
+        <div className="sync-banner">
+          <span className="spinner spinner--sm"></span>
+          <span>Syncing with Supabase...</span>
+        </div>
+      )}
+
       <main className="main">
         <div className="tabs">
           <button 
             className={`tab-btn ${activeTab === 'transactions' ? 'tab-btn--active' : ''}`}
             onClick={() => setActiveTab('transactions')}
+            title="Shortcut: Alt+1"
           >
             Transactions
           </button>
           <button 
             className={`tab-btn ${activeTab === 'statistics' ? 'tab-btn--active' : ''}`}
             onClick={() => setActiveTab('statistics')}
+            title="Shortcut: Alt+2"
           >
             Statistics
           </button>
+          <button 
+            className={`tab-btn ${activeTab === 'goals' ? 'tab-btn--active' : ''}`}
+            onClick={() => setActiveTab('goals')}
+            title="Shortcut: Alt+3"
+          >
+            Savings Goals
+          </button>
         </div>
 
-        {activeTab === 'transactions' ? (
+        {activeTab === 'transactions' && (
           <>
             <AccountCards accounts={accounts} loading={accLoading} txnLoading={txnLoading} activeLedger={activeLedger} transactions={transactions} />
             <TransactionForm accounts={accounts} onAdd={handleAdd} />
@@ -163,13 +237,26 @@ function AppContent() {
               activeLedger={activeLedger}
             />
           </>
-        ) : (
-          <StatisticsView
-            transactions={filteredTransactions}
-            filters={filters}
-            onFilterChange={setFilters}
-            onNavigate={() => setActiveTab('transactions')}
-          />
+        )}
+
+        {activeTab === 'statistics' && (
+          <>
+            <FilterBar
+              accounts={accounts}
+              filters={filters}
+              onFilterChange={setFilters}
+            />
+            <StatisticsView
+              transactions={filteredTransactions}
+              filters={filters}
+              onFilterChange={setFilters}
+              onNavigate={() => setActiveTab('transactions')}
+            />
+          </>
+        )}
+
+        {activeTab === 'goals' && (
+          <SavingsGoalsView />
         )}
       </main>
 

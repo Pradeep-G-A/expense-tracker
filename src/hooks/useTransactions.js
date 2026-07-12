@@ -1,13 +1,29 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../supabaseClient';
+import {
+  addPendingTransaction,
+  getPendingTransactions,
+  deletePendingTransaction
+} from '../utils/indexedDb';
 
 export function useTransactions(user) {
   const userId = user?.id;
 
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [syncing, setSyncing] = useState(false);
+  const isSyncingRef = useRef(false);
 
   const fetchTransactions = useCallback(async () => {
+    // Get local pending items first
+    let pending = [];
+    try {
+      pending = await getPendingTransactions();
+    } catch (e) {
+      console.warn('Failed to load pending transactions from IndexedDB:', e);
+    }
+
     const { data, error } = await supabase
       .from('transactions')
       .select('*')
@@ -16,34 +32,93 @@ export function useTransactions(user) {
 
     if (error) {
       console.error('Error fetching transactions:', error);
+      // If query fails (e.g. network disconnected), show whatever we currently have plus offline items
+      if (pending.length > 0) {
+        setTransactions(prev => {
+          const nonPending = prev.filter(t => !t.is_offline);
+          return [...pending, ...nonPending];
+        });
+      }
+      setLoading(false);
       return;
     }
-    setTransactions(data || []);
+
+    // Combine remote data with local offline pending transactions
+    // Prepend pending transactions so they appear at the top
+    const combined = [...pending, ...(data || [])];
+    setTransactions(combined);
     setLoading(false);
   }, []);
 
+  const syncOfflineTransactions = useCallback(async () => {
+    if (!navigator.onLine || isSyncingRef.current) return;
+    isSyncingRef.current = true;
+    setSyncing(true);
+    try {
+      const pending = await getPendingTransactions();
+      if (pending.length > 0) {
+        console.log(`Syncing ${pending.length} offline transactions...`);
+        for (const tx of pending) {
+          // Prepare Supabase insert payload (strip out local database metadata)
+          const { id, is_offline, created_at, ...payload } = tx;
+          
+          const { error } = await supabase
+            .from('transactions')
+            .insert(payload);
+          
+          if (!error) {
+            await deletePendingTransaction(tx.id);
+          } else {
+            console.error('Error syncing transaction to Supabase:', error);
+            // If it's a structural or validation error, we delete it to avoid getting stuck,
+            // but if it's a network issue we keep it. Since we are navigator.onLine,
+            // it's likely a auth/validation error.
+            if (error.code !== 'PGRST100' && error.status !== 503) {
+              await deletePendingTransaction(tx.id);
+            }
+          }
+        }
+        await fetchTransactions();
+      }
+    } catch (err) {
+      console.error('Failed during offline sync:', err);
+    } finally {
+      isSyncingRef.current = false;
+      setSyncing(false);
+    }
+  }, [fetchTransactions]);
+
+  // Monitor network status
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      syncOfflineTransactions();
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    // Initial sync trigger
+    if (navigator.onLine) {
+      syncOfflineTransactions();
+    }
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [syncOfflineTransactions]);
+
+  // Fetch when user state changes
   useEffect(() => {
     if (!userId) {
       setTransactions([]);
       return;
     }
-
     fetchTransactions();
-
-    const channel = supabase
-      .channel('transactions-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'transactions' },
-        () => {
-          fetchTransactions();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, [fetchTransactions, userId]);
 
   const addTransaction = async (transaction) => {
@@ -51,17 +126,35 @@ export function useTransactions(user) {
       ? Math.max(...transactions.map(t => t.sort_order || 0))
       : 0;
 
+    const newTx = {
+      amount: Number(transaction.amount),
+      category: transaction.category,
+      account: transaction.account,
+      date: transaction.date,
+      time: transaction.time || null,
+      note: transaction.note || null,
+      sort_order: maxSortOrder + 1,
+    };
+
+    if (!navigator.onLine) {
+      const tempId = `offline-${Date.now()}`;
+      const offlineTx = {
+        ...newTx,
+        id: tempId,
+        is_offline: true,
+        created_at: new Date().toISOString()
+      };
+
+      await addPendingTransaction(offlineTx);
+      
+      // Update local state optimistically
+      setTransactions(prev => [offlineTx, ...prev]);
+      return offlineTx;
+    }
+
     const { data, error } = await supabase
       .from('transactions')
-      .insert({
-        amount: Number(transaction.amount),
-        category: transaction.category,
-        account: transaction.account,
-        date: transaction.date,
-        time: transaction.time || null,
-        note: transaction.note || null,
-        sort_order: maxSortOrder + 1,
-      })
+      .insert(newTx)
       .select()
       .single();
 
@@ -70,12 +163,17 @@ export function useTransactions(user) {
       throw error;
     }
 
-    // Re-fetch to get properly sorted data
     await fetchTransactions();
     return data;
   };
 
   const updateTransaction = async (id, updates) => {
+    // Prevent updating offline items until they are synced
+    if (id.toString().startsWith('offline-')) {
+      alert('Cannot update transactions while they are queued offline. Please reconnect first.');
+      return;
+    }
+
     const cleanUpdates = { ...updates };
     if (cleanUpdates.amount !== undefined) {
       cleanUpdates.amount = Number(cleanUpdates.amount);
@@ -93,12 +191,18 @@ export function useTransactions(user) {
       throw error;
     }
 
-    // Re-fetch to get properly sorted data (in case date/time changed)
     await fetchTransactions();
     return data;
   };
 
   const deleteTransaction = async (id) => {
+    if (id.toString().startsWith('offline-')) {
+      // Simply delete from IndexedDB
+      await deletePendingTransaction(id);
+      setTransactions(prev => prev.filter(t => t.id !== id));
+      return;
+    }
+
     const { error } = await supabase
       .from('transactions')
       .delete()
@@ -109,11 +213,15 @@ export function useTransactions(user) {
       throw error;
     }
 
-    // Re-fetch to ensure consistent state
     await fetchTransactions();
   };
 
   const reorderTransactions = async (activeId, overId) => {
+    if (activeId.toString().startsWith('offline-') || overId.toString().startsWith('offline-')) {
+      alert('Reordering is not supported for offline pending transactions.');
+      return;
+    }
+
     const oldIndex = transactions.findIndex(t => t.id === activeId);
     const newIndex = transactions.findIndex(t => t.id === overId);
 
@@ -151,6 +259,8 @@ export function useTransactions(user) {
   return {
     transactions,
     loading,
+    isOnline,
+    syncing,
     addTransaction,
     updateTransaction,
     deleteTransaction,

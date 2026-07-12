@@ -1,9 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Filter, X, Search, Calendar } from 'lucide-react';
 import { CATEGORIES } from '../../utils/constants';
 
 export default function FilterBar({ accounts, filters, onFilterChange }) {
   const [isOpen, setIsOpen] = useState(false);
+  const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    const handleFocusSearch = () => {
+      if (searchInputRef.current) {
+        searchInputRef.current.focus();
+        searchInputRef.current.select();
+      }
+    };
+    window.addEventListener('focus-search', handleFocusSearch);
+    return () => window.removeEventListener('focus-search', handleFocusSearch);
+  }, []);
 
   const activeCount = Object.values(filters).filter(v => v && v !== 'all').length;
 
@@ -69,6 +81,7 @@ export default function FilterBar({ accounts, filters, onFilterChange }) {
         <div className="filter-bar__search">
           <Search size={16} className="search-icon" />
           <input
+            ref={searchInputRef}
             type="text"
             placeholder="Search notes..."
             value={filters.search || ''}

@@ -8,8 +8,6 @@ import {
 } from 'recharts';
 import { formatCurrency } from '../../utils/formatters';
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#06b6d4'];
-
 export default function StatisticsView({ transactions, filters, onFilterChange, onNavigate }) {
   const { expensesByCategory, totalIncome, totalExpense } = useMemo(() => {
     const expenses = {};
@@ -52,6 +50,13 @@ export default function StatisticsView({ transactions, filters, onFilterChange, 
     }
   };
 
+  // Helper to calculate monochromatic opacity based on slice index
+  const getSliceOpacity = (index, total) => {
+    if (total <= 1) return 1.0;
+    // Distribute opacities from 1.0 down to 0.25
+    return 1.0 - (index / Math.max(1, total - 1)) * 0.75;
+  };
+
   if (!transactions.length) {
     return (
       <div className="stats-empty">
@@ -63,19 +68,16 @@ export default function StatisticsView({ transactions, filters, onFilterChange, 
 
   return (
     <div className="statistics-view">
-      <div className="stats-summary">
-        <div className="stats-summary__card">
-          <h4>Total Income</h4>
-          <span className="text-positive">{formatCurrency(totalIncome)}</span>
-        </div>
-        <div className="stats-summary__card">
-          <h4>Total Expenses</h4>
-          <span className="text-negative">{formatCurrency(totalExpense)}</span>
-        </div>
-      </div>
-
       <div className="stats-chart-container">
         <h3>Expenses by Category</h3>
+        
+        {/* Simple totals line replacing the card summary */}
+        <div className="stats-totals-line">
+          <span>Income: <strong className="text-positive">{formatCurrency(totalIncome)}</strong></span>
+          <span className="line-separator">|</span>
+          <span>Expenses: <strong className="text-negative">{formatCurrency(totalExpense)}</strong></span>
+        </div>
+
         {expensesByCategory.length > 0 ? (
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={300}>
@@ -86,20 +88,29 @@ export default function StatisticsView({ transactions, filters, onFilterChange, 
                   cy="50%"
                   innerRadius={60}
                   outerRadius={100}
-                  paddingAngle={3}
+                  paddingAngle={2}
                   dataKey="value"
                   onClick={(data) => handleCategoryClick(data.name)}
                   style={{ cursor: 'pointer' }}
                 >
-                  {expensesByCategory.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                      opacity={activeCategory && activeCategory !== entry.name ? 0.3 : 1}
-                      stroke={activeCategory === entry.name ? '#ffffff' : 'none'}
-                      strokeWidth={activeCategory === entry.name ? 3 : 0}
-                    />
-                  ))}
+                  {expensesByCategory.map((entry, index) => {
+                    const baseOpacity = getSliceOpacity(index, expensesByCategory.length);
+                    // Dim if another category is selected
+                    const isSelected = activeCategory === entry.name;
+                    const finalOpacity = activeCategory 
+                      ? (isSelected ? 1.0 : 0.15) 
+                      : baseOpacity;
+
+                    return (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill="var(--primary)"
+                        opacity={finalOpacity}
+                        stroke="var(--bg-card)"
+                        strokeWidth={2}
+                      />
+                    );
+                  })}
                 </Pie>
                 <Tooltip 
                   formatter={(value) => formatCurrency(value)}
@@ -112,25 +123,43 @@ export default function StatisticsView({ transactions, filters, onFilterChange, 
                 />
               </PieChart>
             </ResponsiveContainer>
+            
             <div className="chart-legend">
-              {expensesByCategory.map((entry, index) => (
-                <div
-                  key={entry.name}
-                  className={`chart-legend-item ${activeCategory === entry.name ? 'chart-legend-item--active' : ''}`}
-                  onClick={() => handleCategoryClick(entry.name)}
-                  style={{ cursor: 'pointer', opacity: activeCategory && activeCategory !== entry.name ? 0.4 : 1 }}
-                >
-                  <span className="chart-legend-color" style={{ background: COLORS[index % COLORS.length] }}></span>
-                  <span className="chart-legend-label">{entry.name}</span>
-                  <span className="chart-legend-value">{formatCurrency(entry.value)}</span>
-                </div>
-              ))}
+              {expensesByCategory.map((entry, index) => {
+                const baseOpacity = getSliceOpacity(index, expensesByCategory.length);
+                const isSelected = activeCategory === entry.name;
+                const finalOpacity = activeCategory
+                  ? (isSelected ? 1.0 : 0.25)
+                  : baseOpacity;
+
+                return (
+                  <div
+                    key={entry.name}
+                    className={`chart-legend-item ${isSelected ? 'chart-legend-item--active' : ''}`}
+                    onClick={() => handleCategoryClick(entry.name)}
+                    style={{ 
+                      cursor: 'pointer', 
+                      opacity: finalOpacity 
+                    }}
+                  >
+                    <span 
+                      className="chart-legend-color" 
+                      style={{ 
+                        background: 'var(--primary)', 
+                        opacity: baseOpacity
+                      }}
+                    ></span>
+                    <span className="chart-legend-label">{entry.name}</span>
+                    <span className="chart-legend-value">{formatCurrency(entry.value)}</span>
+                  </div>
+                );
+              })}
             </div>
             {activeCategory && (
               <button
                 className="btn btn--ghost btn--sm"
                 onClick={() => onFilterChange({ ...filters, category: 'all' })}
-                style={{ alignSelf: 'center', marginTop: '8px' }}
+                style={{ alignSelf: 'center', marginTop: '12px' }}
               >
                 Clear category filter
               </button>

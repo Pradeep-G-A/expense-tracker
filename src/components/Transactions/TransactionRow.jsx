@@ -3,10 +3,11 @@ import { formatCurrency, formatDate } from '../../utils/formatters';
 export default function TransactionRow({ 
   transaction, 
   onView, 
+  onDelete,
   runningBalance 
 }) {
   return (
-    <tr className="txn-row">
+    <tr className={`txn-row ${transaction.is_offline ? 'txn-row--offline' : ''}`}>
       <td className="td--date" data-label="Date">{formatDate(transaction.date)}</td>
       <td className={`td--amount ${transaction.amount >= 0 ? 'text-positive' : 'text-negative'}`} data-label="Amount">
         {transaction.amount >= 0 ? '+' : '−'}{formatCurrency(Math.abs(transaction.amount))}
@@ -19,12 +20,28 @@ export default function TransactionRow({
           {transaction.account}
         </span>
       </td>
-      <td className="td--note" data-label="Note">{transaction.note || '—'}</td>
+      <td className="td--note" data-label="Note">
+        {transaction.note || '—'}
+        {transaction.is_offline && <span className="offline-note-indicator"> (Queued for sync)</span>}
+      </td>
       <td className="td--balance" data-label="Net Balance">
         {runningBalance != null ? `${transaction.account}: ${formatCurrency(runningBalance)}` : '—'}
       </td>
       <td className="td--actions" data-label="Actions">
-        <button className="btn btn--view" onClick={onView}>View</button>
+        {transaction.is_offline ? (
+          <div className="offline-actions">
+            <span className="badge badge--offline">Offline</span>
+            <button 
+              className="btn btn--sm btn--danger-outline" 
+              onClick={() => onDelete(transaction.id)}
+              title="Delete offline draft"
+            >
+              Delete
+            </button>
+          </div>
+        ) : (
+          <button className="btn btn--view" onClick={onView}>View</button>
+        )}
       </td>
     </tr>
   );
