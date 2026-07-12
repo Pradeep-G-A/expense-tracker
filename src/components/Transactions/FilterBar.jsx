@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Filter, X, Search } from 'lucide-react';
+import { Filter, X, Search, Calendar } from 'lucide-react';
 import { CATEGORIES } from '../../utils/constants';
 
 export default function FilterBar({ accounts, filters, onFilterChange }) {
@@ -21,6 +21,31 @@ export default function FilterBar({ accounts, filters, onFilterChange }) {
     });
   };
 
+  const applyThisMonth = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const firstDay = `${year}-${month}-01`;
+    const lastDay = new Date(year, now.getMonth() + 1, 0);
+    const lastDayStr = `${year}-${month}-${String(lastDay.getDate()).padStart(2, '0')}`;
+
+    onFilterChange({
+      ...filters,
+      dateFrom: firstDay,
+      dateTo: lastDayStr,
+    });
+  };
+
+  const isThisMonthActive = (() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const firstDay = `${year}-${month}-01`;
+    const lastDay = new Date(year, now.getMonth() + 1, 0);
+    const lastDayStr = `${year}-${month}-${String(lastDay.getDate()).padStart(2, '0')}`;
+    return filters.dateFrom === firstDay && filters.dateTo === lastDayStr;
+  })();
+
   return (
     <div className="filter-bar">
       <div className="filter-bar__toggle-row">
@@ -31,6 +56,14 @@ export default function FilterBar({ accounts, filters, onFilterChange }) {
           <Filter size={16} />
           Filters
           {activeCount > 0 && <span className="filter-badge">{activeCount}</span>}
+        </button>
+
+        <button
+          className={`btn btn--ghost btn--sm ${isThisMonthActive ? 'filter-bar__toggle--active' : ''}`}
+          onClick={applyThisMonth}
+        >
+          <Calendar size={14} />
+          This Month
         </button>
 
         <div className="filter-bar__search">

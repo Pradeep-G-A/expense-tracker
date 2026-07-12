@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import TransactionRow from './TransactionRow';
 import TransactionModal from './TransactionModal';
-import { ArrowUpDown, ArrowUp, ArrowDown, Receipt, CreditCard, Building2, WalletCards } from 'lucide-react';
+import { Receipt, CreditCard, Building2, WalletCards } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 
 const ACCOUNT_ICONS = {
@@ -110,12 +110,7 @@ export default function TransactionTable({
     }));
   };
 
-  const getSortIcon = (column) => {
-    if (sortConfig.key !== column) return <ArrowUpDown size={14} className="sort-icon sort-icon--inactive" />;
-    return sortConfig.direction === 'asc'
-      ? <ArrowUp size={14} className="sort-icon" />
-      : <ArrowDown size={14} className="sort-icon" />;
-  };
+
 
   if (loading) {
     return (
@@ -149,22 +144,22 @@ export default function TransactionTable({
               <tr>
                 <th className="th--date" onClick={() => handleSort('date')}>
                   <div className="th-content">
-                    Date {getSortIcon('date')}
+                    Date
                   </div>
                 </th>
                 <th className="th--amount" onClick={() => handleSort('amount')}>
                   <div className="th-content">
-                    Amount {getSortIcon('amount')}
+                    Amount
                   </div>
                 </th>
                 <th className="th--category" onClick={() => handleSort('category')}>
                   <div className="th-content">
-                    Category {getSortIcon('category')}
+                    Category
                   </div>
                 </th>
                 <th className="th--account" onClick={() => handleSort('account')}>
                   <div className="th-content">
-                    Account {getSortIcon('account')}
+                    Account
                   </div>
                 </th>
                 <th className="th--note">Note</th>

@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../supabaseClient';
 
-export function useTransactions() {
+export function useTransactions(user) {
+  const userId = user?.id;
+
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -21,6 +23,11 @@ export function useTransactions() {
   }, []);
 
   useEffect(() => {
+    if (!userId) {
+      setTransactions([]);
+      return;
+    }
+
     fetchTransactions();
 
     const channel = supabase
@@ -37,7 +44,7 @@ export function useTransactions() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchTransactions]);
+  }, [fetchTransactions, userId]);
 
   const addTransaction = async (transaction) => {
     const maxSortOrder = transactions.length > 0

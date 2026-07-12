@@ -21,8 +21,8 @@ function AppContent() {
     updateTransaction,
     deleteTransaction,
     reorderTransactions,
-  } = useTransactions();
-  const { accounts, loading: accLoading } = useAccounts(transactions);
+  } = useTransactions(user);
+  const { accounts, loading: accLoading } = useAccounts(transactions, user);
 
   const [activeLedger, setActiveLedger] = useState(1);
   const [activeTab, setActiveTab] = useState('transactions');
@@ -164,7 +164,12 @@ function AppContent() {
             />
           </>
         ) : (
-          <StatisticsView transactions={filteredTransactions} />
+          <StatisticsView
+            transactions={filteredTransactions}
+            filters={filters}
+            onFilterChange={setFilters}
+            onNavigate={() => setActiveTab('transactions')}
+          />
         )}
       </main>
 

@@ -1048,6 +1048,8 @@ body {
 
 .table-wrapper {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 65vh; /* Keep scroll contained within the table */
   border: 2px solid var(--border-primary);
   border-radius: var(--radius-md);
   background: var(--bg-card);

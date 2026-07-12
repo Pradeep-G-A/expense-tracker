@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../supabaseClient';
 
-export function useAccounts(transactions) {
+export function useAccounts(transactions, user) {
+  const userId = user?.id;
+
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -20,6 +22,11 @@ export function useAccounts(transactions) {
   }, []);
 
   useEffect(() => {
+    if (!userId) {
+      setAccounts([]);
+      return;
+    }
+
     fetchAccounts();
 
     const channel = supabase
@@ -32,7 +39,7 @@ export function useAccounts(transactions) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchAccounts]);
+  }, [fetchAccounts, userId]);
 
   // Compute current balances — both ledgers affected equally
   // Expenses are negative amounts, income is positive
