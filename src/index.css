@@ -1447,20 +1447,18 @@ body {
     left: 0;
     right: 0;
     height: 70px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-top: 1px solid var(--glass-border);
+    background: var(--bg-card); /* Reverted to plain background */
+    border-top: 1px solid var(--border-primary);
     display: flex;
     justify-content: space-around;
     align-items: center;
     padding-bottom: env(safe-area-inset-bottom);
     z-index: 100;
-    box-shadow: var(--glass-shadow);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1); /* Subtle shadow for plain bg */
   }
   
   :root[data-theme='dark'] .bottom-nav {
-    background: var(--glass-bg);
+    background: var(--bg-card);
   }
 
   .bottom-nav__item {
@@ -1519,11 +1517,18 @@ body {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 6px 16px;
-    display: inline-block;
+    border-radius: 8px; /* Slightly squarer radius to match the row */
+    padding: 8px 12px;
+    display: block; /* Fixes the squished layout */
     margin-bottom: 8px;
     box-shadow: var(--glass-shadow);
+  }
+
+  .txn-date-header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
   }
 
   /* Glassmorphic Cards (Dashboard, Stats, Goals, Modals) */
