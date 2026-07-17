@@ -1400,7 +1400,91 @@ body {
 }
 
 @media (max-width: 640px) {
-  .main { padding: 16px 12px 40px; }
+  /* Increase bottom padding to prevent content from hiding under bottom nav */
+  .main { padding: 16px 12px 100px; }
+
+  /* Hide desktop-only elements on mobile */
+  .tabs { display: none !important; }
+  .transaction-form-desktop { display: none !important; }
+
+  /* --- Bottom Navigation Bar --- */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.85); /* Glassmorphism */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 100;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+  }
+  
+  :root[data-theme='dark'] .bottom-nav {
+    background: rgba(30, 30, 30, 0.85);
+  }
+
+  .bottom-nav__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .bottom-nav__item--active {
+    color: var(--primary);
+  }
+
+  .bottom-nav__fab-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    top: -20px; /* Elevated FAB */
+  }
+
+  .bottom-nav__fab {
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .bottom-nav__fab:active {
+    transform: scale(0.95);
+    background: var(--bg-overlay);
+  }
+
+  /* --- Sticky Date Headers --- */
+  .txn-date-header-text {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg-card); /* Keep it solid so items scroll under it nicely */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
 
   /* Premium Mobile Carousel for Dashboard Metrics */
   .dashboard-modules {
@@ -1424,6 +1508,26 @@ body {
     scroll-snap-align: center;
   }
 
+  .carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: -8px;
+    margin-bottom: 24px;
+  }
+  .carousel-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border-color);
+    transition: all 0.2s;
+  }
+  .carousel-dot--active {
+    background: var(--primary);
+    width: 16px;
+    border-radius: 4px;
+  }
+
 
   .transaction-form__fields {
     grid-template-columns: 1fr;
@@ -1441,15 +1545,6 @@ body {
     max-width: 100%;
     order: 3;
     width: 100%;
-  }
-
-
-
-  .tabs {
-    width: 100%;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
   }
 
   .tab-btn {
@@ -1675,26 +1770,57 @@ body {
   bottom: 0;
   background: var(--bg-overlay);
   display: flex;
-  align-items: center;
+  align-items: flex-end; /* Mobile: snap to bottom */
   justify-content: center;
   z-index: 1000;
-  padding: 20px;
+  animation: fadeInOverlay 0.3s ease-out forwards;
+}
+
+@keyframes fadeInOverlay {
+  from { background: transparent; backdrop-filter: blur(0px); }
+  to { background: var(--bg-overlay); backdrop-filter: blur(4px); }
+}
+
+@media (min-width: 641px) {
+  .modal-overlay {
+    align-items: center;
+    padding: 20px;
+  }
 }
 
 .modal-content {
   background: var(--bg-card);
-  border: 2px solid var(--border-primary);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--border-primary);
   width: 100%;
   max-width: 500px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  border-radius: 24px 24px 0 0; /* Rounded top on mobile */
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.15);
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0.8; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (min-width: 641px) {
+  .modal-content {
+    border-radius: var(--radius-md);
+    animation: fadeIn 0.2s ease-out forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .modal-header {
   padding: 20px 24px;
-  border-bottom: 2px solid var(--border-primary);
+  border-bottom: 1px solid var(--border-primary);
   display: flex;
   align-items: center;
   justify-content: space-between;

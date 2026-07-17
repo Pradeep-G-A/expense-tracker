@@ -1,6 +1,6 @@
 import { Wallet, TrendingDown, CreditCard, Building2, WalletCards } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
-import { useMemo } from 'react';
+import { useMemo, useState, useRef } from 'react';
 
 const ACCOUNT_ICONS = {
   HDFC: CreditCard,
@@ -9,6 +9,20 @@ const ACCOUNT_ICONS = {
 };
 
 export default function AccountCards({ accounts, loading, txnLoading, activeLedger, transactions }) {
+  const [activeCard, setActiveCard] = useState(0);
+  const scrollRef = useRef(null);
+
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const scrollLeft = scrollRef.current.scrollLeft;
+      const width = scrollRef.current.clientWidth;
+      const index = Math.round(scrollLeft / width);
+      if (index !== activeCard) {
+        setActiveCard(index);
+      }
+    }
+  };
+
   const { totalBalance, todaySpend, yesterdaySpend, totalLent } = useMemo(() => {
     let totalBal = 0;
     if (!txnLoading) {
@@ -70,8 +84,9 @@ export default function AccountCards({ accounts, loading, txnLoading, activeLedg
   }
 
   return (
-    <div className="dashboard-modules">
-      {/* Module 1: Total Balance */}
+    <div className="dashboard-modules-wrapper">
+      <div className="dashboard-modules" ref={scrollRef} onScroll={handleScroll}>
+        {/* Module 1: Total Balance */}
       <div className="dashboard-module">
         <h3 className="dashboard-module__title">Total Balance</h3>
         <div className="dashboard-module__content dashboard-module__content--center">
@@ -137,5 +152,13 @@ export default function AccountCards({ accounts, loading, txnLoading, activeLedg
         </div>
       </div>
     </div>
+
+    {/* Mobile Pagination Dots */}
+    <div className="carousel-dots">
+      {[0, 1, 2, 3].map(idx => (
+        <div key={idx} className={`carousel-dot ${activeCard === idx ? 'carousel-dot--active' : ''}`} />
+      ))}
+    </div>
+  </div>
   );
 }

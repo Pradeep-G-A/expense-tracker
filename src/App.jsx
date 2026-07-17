@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
+import { Plus, X, List, BarChart2, Target, Settings } from 'lucide-react';
 import { ThemeProvider } from './context/ThemeContext';
 import { useAuth } from './hooks/useAuth';
 import { useTransactions } from './hooks/useTransactions';
@@ -29,6 +30,7 @@ function AppContent() {
 
   const [activeLedger, setActiveLedger] = useState(1);
   const [activeTab, setActiveTab] = useState('transactions');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [filters, setFilters] = useState({
     account: 'all',
@@ -220,7 +222,25 @@ function AppContent() {
         {activeTab === 'transactions' && (
           <>
             <AccountCards accounts={accounts} loading={accLoading} txnLoading={txnLoading} activeLedger={activeLedger} transactions={transactions} />
-            <TransactionForm accounts={accounts} onAdd={handleAdd} />
+            
+            <div className="transaction-form-desktop">
+              <TransactionForm accounts={accounts} onAdd={handleAdd} />
+            </div>
+
+            {isModalOpen && (
+              <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                  <button className="modal-close" onClick={() => setIsModalOpen(false)}>
+                    <X size={20} />
+                  </button>
+                  <TransactionForm accounts={accounts} onAdd={(data) => {
+                    handleAdd(data);
+                    setIsModalOpen(false);
+                  }} />
+                </div>
+              </div>
+            )}
+
             <FilterBar
               accounts={accounts}
               filters={filters}
@@ -258,6 +278,42 @@ function AppContent() {
         {activeTab === 'goals' && (
           <SavingsGoalsView />
         )}
+
+        {activeTab === 'settings' && (
+          <div className="settings-view" style={{ padding: '20px', paddingBottom: '40px' }}>
+            <h2 className="section-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Settings size={24} /> Settings & Profile
+            </h2>
+            
+            <div className="settings-section" style={{ background: 'var(--bg-card)', padding: '20px', borderRadius: '16px', marginBottom: '32px', border: '1px solid var(--border-color)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+              <h3 style={{ marginTop: 0, marginBottom: '16px', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Active Ledger</h3>
+              <div className="ledger-toggle-wrapper" style={{ display: 'flex', width: '100%' }}>
+                <button 
+                  className={`ledger-toggle-btn ${activeLedger === 1 ? 'ledger-toggle-btn--active' : ''}`}
+                  onClick={() => setActiveLedger(1)}
+                  style={{ flex: 1, padding: '12px', fontSize: '1rem' }}
+                >
+                  Ledger 1
+                </button>
+                <button 
+                  className={`ledger-toggle-btn ${activeLedger === 2 ? 'ledger-toggle-btn--active' : ''}`}
+                  onClick={() => setActiveLedger(2)}
+                  style={{ flex: 1, padding: '12px', fontSize: '1rem' }}
+                >
+                  Ledger 2
+                </button>
+              </div>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '12px', marginBottom: 0 }}>
+                Switching ledgers dynamically updates all balances and transaction history across the app.
+              </p>
+            </div>
+
+            <h2 className="section-title" style={{ marginBottom: '16px' }}>Dashboard Summary</h2>
+            {/* Reusing the dashboard modules inside Settings! */}
+            <AccountCards accounts={accounts} loading={accLoading} txnLoading={txnLoading} activeLedger={activeLedger} transactions={transactions} />
+            
+          </div>
+        )}
       </main>
 
       <div className="toast-container">
@@ -270,6 +326,44 @@ function AppContent() {
           />
         ))}
       </div>
+
+      <nav className="bottom-nav">
+        <button 
+          className={`bottom-nav__item ${activeTab === 'transactions' ? 'bottom-nav__item--active' : ''}`} 
+          onClick={() => setActiveTab('transactions')}
+        >
+          <List size={22} />
+          <span>Txns</span>
+        </button>
+        <button 
+          className={`bottom-nav__item ${activeTab === 'statistics' ? 'bottom-nav__item--active' : ''}`} 
+          onClick={() => setActiveTab('statistics')}
+        >
+          <BarChart2 size={22} />
+          <span>Stats</span>
+        </button>
+        
+        <div className="bottom-nav__fab-wrapper">
+          <button className="bottom-nav__fab" onClick={() => setIsModalOpen(true)}>
+            <Plus size={28} />
+          </button>
+        </div>
+
+        <button 
+          className={`bottom-nav__item ${activeTab === 'goals' ? 'bottom-nav__item--active' : ''}`} 
+          onClick={() => setActiveTab('goals')}
+        >
+          <Target size={22} />
+          <span>Goals</span>
+        </button>
+        <button 
+          className={`bottom-nav__item ${activeTab === 'settings' ? 'bottom-nav__item--active' : ''}`} 
+          onClick={() => setActiveTab('settings')}
+        >
+          <Settings size={22} />
+          <span>Settings</span>
+        </button>
+      </nav>
     </div>
   );
 }
