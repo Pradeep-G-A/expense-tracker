@@ -1511,7 +1511,7 @@ body {
   /* --- Sticky Date Headers --- */
   .txn-date-header-text {
     position: sticky;
-    top: 0;
+    top: 52px; /* Offset by the height of the mobile header so it doesn't hide behind it */
     z-index: 5;
     background: var(--glass-bg);
     backdrop-filter: blur(12px);
