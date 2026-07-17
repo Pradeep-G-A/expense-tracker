@@ -1400,12 +1400,45 @@ body {
 }
 
 @media (max-width: 640px) {
+  /* --- Mobile Glassmorphism Variables --- */
+  :root {
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  }
+  
+  :root[data-theme='dark'] {
+    --glass-bg: rgba(20, 20, 20, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  /* Dynamic Mesh Background for Mobile */
+  .app {
+    background-color: var(--bg-primary);
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(138, 43, 226, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(0, 191, 255, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(255, 105, 180, 0.15) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(50, 205, 50, 0.15) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  /* Glassmorphic Top Header */
+  .header {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--glass-border) !important;
+  }
+
   /* Increase bottom padding to prevent content from hiding under bottom nav */
   .main { padding: 16px 12px 100px; }
 
   /* Hide desktop-only elements on mobile */
   .tabs { display: none !important; }
   .transaction-form-desktop { display: none !important; }
+  .header .ledger-toggle-wrapper { display: none !important; }
 
   /* --- Bottom Navigation Bar --- */
   .bottom-nav {
@@ -1414,20 +1447,20 @@ body {
     left: 0;
     right: 0;
     height: 70px;
-    background: rgba(255, 255, 255, 0.85); /* Glassmorphism */
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid var(--border-color);
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--glass-border);
     display: flex;
     justify-content: space-around;
     align-items: center;
     padding-bottom: env(safe-area-inset-bottom);
     z-index: 100;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+    box-shadow: var(--glass-shadow);
   }
   
   :root[data-theme='dark'] .bottom-nav {
-    background: rgba(30, 30, 30, 0.85);
+    background: var(--glass-bg);
   }
 
   .bottom-nav__item {
@@ -1482,8 +1515,43 @@ body {
     position: sticky;
     top: 0;
     z-index: 5;
-    background: var(--bg-card); /* Keep it solid so items scroll under it nicely */
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 6px 16px;
+    display: inline-block;
+    margin-bottom: 8px;
+    box-shadow: var(--glass-shadow);
+  }
+
+  /* Glassmorphic Cards (Dashboard, Stats, Goals, Modals) */
+  .dashboard-module, 
+  .stats-chart-container, 
+  .goal-card,
+  .settings-section,
+  .modal-content {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow) !important;
+  }
+
+  /* Glassmorphic Transaction Items */
+  .txn-row {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow) !important;
+    margin-bottom: 8px !important;
+    border-radius: 12px !important;
+  }
+  .transaction-table {
+    background: transparent !important;
+    border: none !important;
   }
 
   /* Premium Mobile Carousel for Dashboard Metrics */
@@ -1592,7 +1660,9 @@ body {
     color: var(--primary);
   }
   .header__title { 
-    display: none !important; 
+    display: block !important; 
+    font-size: 1.1rem;
+    margin-left: 8px;
   }
   .header__right {
     gap: 4px;
