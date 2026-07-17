@@ -227,20 +227,6 @@ function AppContent() {
               <TransactionForm accounts={accounts} onAdd={handleAdd} />
             </div>
 
-            {isModalOpen && (
-              <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                  <button className="modal-close" onClick={() => setIsModalOpen(false)}>
-                    <X size={20} />
-                  </button>
-                  <TransactionForm accounts={accounts} onAdd={(data) => {
-                    handleAdd(data);
-                    setIsModalOpen(false);
-                  }} />
-                </div>
-              </div>
-            )}
-
             <FilterBar
               accounts={accounts}
               filters={filters}
@@ -309,12 +295,27 @@ function AppContent() {
             </div>
 
             <h2 className="section-title" style={{ marginBottom: '16px' }}>Dashboard Summary</h2>
-            {/* Reusing the dashboard modules inside Settings! */}
-            <AccountCards accounts={accounts} loading={accLoading} txnLoading={txnLoading} activeLedger={activeLedger} transactions={transactions} />
-            
+            <div className="settings-dashboard-override">
+              <AccountCards accounts={accounts} loading={accLoading} txnLoading={txnLoading} activeLedger={activeLedger} transactions={transactions} />
+            </div>
           </div>
         )}
       </main>
+
+      {/* Global Transaction Modal - Opens from any tab! */}
+      {isModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setIsModalOpen(false)}>
+              <X size={20} />
+            </button>
+            <TransactionForm accounts={accounts} onAdd={(data) => {
+              handleAdd(data);
+              setIsModalOpen(false);
+            }} />
+          </div>
+        </div>
+      )}
 
       <div className="toast-container">
         {toasts.map(toast => (

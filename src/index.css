@@ -1508,6 +1508,24 @@ body {
     scroll-snap-align: center;
   }
 
+  .settings-dashboard-override .dashboard-modules {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+  }
+
+  .settings-dashboard-override .dashboard-module {
+    flex: 1 1 auto;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .settings-dashboard-override .carousel-dots {
+    display: none;
+  }
+
   .carousel-dots {
     display: flex;
     justify-content: center;
