@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import TransactionRow from './TransactionRow';
+import TransactionCard from './TransactionCard';
 import TransactionModal from './TransactionModal';
 import { Receipt, CreditCard, Building2, WalletCards } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
@@ -138,78 +139,104 @@ export default function TransactionTable({
           <p>No transactions found matching your filters.</p>
         </div>
       ) : (
-        <div className="table-wrapper">
-          <table className="txn-table">
-            <thead>
-              <tr>
-                <th className="th--date" onClick={() => handleSort('date')}>
-                  <div className="th-content">
-                    Date
-                  </div>
-                </th>
-                <th className="th--amount" onClick={() => handleSort('amount')}>
-                  <div className="th-content">
-                    Amount
-                  </div>
-                </th>
-                <th className="th--category" onClick={() => handleSort('category')}>
-                  <div className="th-content">
-                    Category
-                  </div>
-                </th>
-                <th className="th--account" onClick={() => handleSort('account')}>
-                  <div className="th-content">
-                    Account
-                  </div>
-                </th>
-                <th className="th--note">Note</th>
-                <th className="th--balance">Net Balance</th>
-                <th className="th--actions">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedTransactions.map((transaction, index) => {
-                const prevTxn = index > 0 ? sortedTransactions[index - 1] : null;
-                const isNewDateGroup = !prevTxn || prevTxn.date !== transaction.date;
-                const dailyTotals = dailyTotalsMap[transaction.date] || { income: 0, expense: 0 };
+        <>
+          {/* ── DESKTOP: Full Table ── */}
+          <div className="table-wrapper desktop-only">
+            <table className="txn-table">
+              <thead>
+                <tr>
+                  <th className="th--date" onClick={() => handleSort('date')}>
+                    <div className="th-content">Date</div>
+                  </th>
+                  <th className="th--amount" onClick={() => handleSort('amount')}>
+                    <div className="th-content">Amount</div>
+                  </th>
+                  <th className="th--category" onClick={() => handleSort('category')}>
+                    <div className="th-content">Category</div>
+                  </th>
+                  <th className="th--account" onClick={() => handleSort('account')}>
+                    <div className="th-content">Account</div>
+                  </th>
+                  <th className="th--note">Note</th>
+                  <th className="th--balance">Net Balance</th>
+                  <th className="th--actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedTransactions.map((transaction, index) => {
+                  const prevTxn = index > 0 ? sortedTransactions[index - 1] : null;
+                  const isNewDateGroup = !prevTxn || prevTxn.date !== transaction.date;
+                  const dailyTotals = dailyTotalsMap[transaction.date] || { income: 0, expense: 0 };
 
-                return (
-                  <React.Fragment key={transaction.id}>
-                    {isNewDateGroup && (
-                      <tr className="txn-date-header">
-                        <td colSpan="7" className="txn-date-header-text">
-                          <div className="txn-date-header-inner">
-                            <span className="txn-date-header-date">{formatDate(transaction.date)}</span>
-                            <div className="daily-totals" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                              {dailyTotals.income > 0 && (
-                                <span className="text-positive">
-                                  In: +{formatCurrency(dailyTotals.income)}
-                                </span>
-                              )}
-                              {dailyTotals.expense > 0 && (
-                                <span className="text-negative">
-                                  Out: -{formatCurrency(dailyTotals.expense)}
-                                </span>
-                              )}
+                  return (
+                    <React.Fragment key={transaction.id}>
+                      {isNewDateGroup && (
+                        <tr className="txn-date-header">
+                          <td colSpan="7" className="txn-date-header-text">
+                            <div className="txn-date-header-inner">
+                              <span className="txn-date-header-date">{formatDate(transaction.date)}</span>
+                              <div className="daily-totals" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                                {dailyTotals.income > 0 && (
+                                  <span className="text-positive">In: +{formatCurrency(dailyTotals.income)}</span>
+                                )}
+                                {dailyTotals.expense > 0 && (
+                                  <span className="text-negative">Out: -{formatCurrency(dailyTotals.expense)}</span>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                    <TransactionRow
-                      transaction={transaction}
-                      accounts={accounts}
-                      onUpdate={onUpdate}
-                      onDelete={onDelete}
-                      onView={() => setViewingTransactionId(transaction.id)}
-                      runningBalance={runningBalanceMap[transaction.id]}
-                    />
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                          </td>
+                        </tr>
+                      )}
+                      <TransactionRow
+                        transaction={transaction}
+                        accounts={accounts}
+                        onUpdate={onUpdate}
+                        onDelete={onDelete}
+                        onView={() => setViewingTransactionId(transaction.id)}
+                        runningBalance={runningBalanceMap[transaction.id]}
+                      />
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* ── MOBILE: Card List ── */}
+          <div className="txn-card-list mobile-only">
+            {sortedTransactions.map((transaction, index) => {
+              const prevTxn = index > 0 ? sortedTransactions[index - 1] : null;
+              const isNewDateGroup = !prevTxn || prevTxn.date !== transaction.date;
+              const dailyTotals = dailyTotalsMap[transaction.date] || { income: 0, expense: 0 };
+
+              return (
+                <React.Fragment key={transaction.id}>
+                  {isNewDateGroup && (
+                    <div className="txn-card-date-header">
+                      <span className="txn-card-date-header__label">
+                        {formatDate(transaction.date)}
+                      </span>
+                      <div className="txn-card-date-header__totals">
+                        {dailyTotals.income > 0 && (
+                          <span className="text-positive">+{formatCurrency(dailyTotals.income)}</span>
+                        )}
+                        {dailyTotals.expense > 0 && (
+                          <span className="text-negative">−{formatCurrency(dailyTotals.expense)}</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <TransactionCard
+                    transaction={transaction}
+                    onView={() => setViewingTransactionId(transaction.id)}
+                    onDelete={onDelete}
+                    runningBalance={runningBalanceMap[transaction.id]}
+                  />
+                </React.Fragment>
+              );
+            })}
+          </div>
+        </>
       )}
 
       {viewingTransactionId && (
