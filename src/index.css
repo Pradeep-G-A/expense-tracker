@@ -1969,6 +1969,86 @@ body {
   gap: 24px;
 }
 
+.stats-date-presets-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stats-date-presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-flat);
+  padding: 6px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-primary);
+}
+
+.preset-pill {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+}
+
+.preset-pill:hover {
+  color: var(--text-primary);
+  background: var(--surface-elevated);
+}
+
+.preset-pill.active {
+  background: var(--primary);
+  color: var(--text-inverse);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.stats-custom-date-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  animation: cardEntrance 0.3s var(--transition-spring) both;
+}
+
+.stats-custom-date-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.stats-custom-date-group input[type="date"] {
+  background: var(--bg-input);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.stats-custom-date-group input[type="date"]:focus {
+  border-color: var(--border-focus);
+}
+
 .stats-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -2042,33 +2122,152 @@ body {
   gap: 20px;
 }
 
-.chart-legend {
+.pie-chart-layout {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.pie-container {
+  flex: 1;
+  min-width: 240px;
+}
+
+/* Donut center label overlay */
+.pie-donut-wrapper {
+  position: relative;
+}
+
+.pie-center-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.pie-center-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  transition: all 0.3s ease;
+}
+
+.pie-center-sub {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+/* Bar chart wrapper */
+.bar-chart-wrapper {
+  height: 260px;
+  margin-top: 20px;
+}
+
+.chart-legend-detailed {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-top: 16px;
-  border-top: 1px solid var(--glass-border);
+  padding-top: 4px;
+  flex: 1;
+  min-width: 200px;
 }
 
-.chart-legend-item {
+.chart-legend-item-detailed {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
+  transition: all var(--transition-smooth);
+  cursor: pointer;
+  animation: cardEntrance 0.35s var(--transition-spring) both;
+}
+
+.chart-legend-item-detailed:hover {
+  background: var(--glass-bg-light);
+  border-color: var(--glass-border-hover);
+  transform: translateX(3px);
+}
+
+.chart-legend-item-detailed.active {
+  background: var(--glass-bg-light);
+  border-color: var(--glass-border-hover);
+  box-shadow: var(--glass-shadow);
+}
+
+.legend-main {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 0.9rem;
+  gap: 10px;
+  min-width: 0;
 }
 
-.chart-legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 4px;
+.legend-color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px currentColor;
 }
 
-.chart-legend-label {
-  flex: 1;
-  color: var(--text-secondary);
+.legend-category-name {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.chart-legend-value { font-weight: 600; }
+.legend-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.legend-amount {
+  font-weight: 700;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.legend-percentage {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--surface-elevated);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border);
+}
+
+.day-wise-chart {
+  margin-top: 16px;
+}
 
 .stats-empty {
   text-align: center;
@@ -2601,18 +2800,159 @@ body {
 .stats-totals-line {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 0.95rem;
+  gap: 16px;
+  padding: 10px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
   font-weight: 500;
   color: var(--text-secondary);
-  margin-top: 8px;
-  margin-bottom: 24px;
+  margin-top: 0;
+  margin-bottom: 20px;
+  box-shadow: var(--glass-shadow);
+}
+
+.stats-totals-line strong {
+  font-size: 1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
 .line-separator {
   color: var(--glass-border);
   font-weight: 300;
+  font-size: 1.2rem;
 }
+
+/* ── Stats Table Header ──────────────────────────────────── */
+.stats-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.stats-table-header h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stats-table-filter-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 3px 9px;
+  background: var(--primary);
+  color: var(--text-inverse);
+  border-radius: var(--radius-full);
+  vertical-align: middle;
+}
+
+.stats-table-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--surface-elevated);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Scroll wrapper */
+.stats-table-scroll {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+}
+
+/* ── Daily Spending Table (Redesigned) ───────────────────── */
+.daily-spending-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.daily-spending-table thead tr {
+  background: var(--surface-flat);
+}
+
+.daily-spending-table th {
+  padding: 11px 16px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-align: left;
+  border-bottom: 1px solid var(--glass-border);
+  white-space: nowrap;
+}
+
+.daily-spending-table th.th--right {
+  text-align: right;
+}
+
+.daily-spending-table tbody tr {
+  border-bottom: 1px solid var(--glass-border);
+  transition: background 0.18s ease;
+}
+
+.daily-spending-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.daily-spending-table tbody tr:hover {
+  background: var(--surface-flat);
+}
+
+/* New date group — stronger top divider */
+.stats-table-row--new-date td {
+  border-top: 1px solid var(--glass-border-hover) !important;
+}
+
+.daily-spending-table td {
+  padding: 10px 16px;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+/* Date pill cell */
+.td--date-cell {
+  width: 140px;
+  white-space: nowrap;
+}
+
+.td--date-text {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--surface-elevated);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+}
+
+/* Amount column */
+.daily-spending-table .td--amount {
+  text-align: right;
+  font-weight: 800;
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--expense);
+  white-space: nowrap;
+}
+
 
 /* ── Offline & Sync Banners ──────────────────────────────── */
 .offline-banner {
