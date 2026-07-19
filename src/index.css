@@ -2717,11 +2717,12 @@ body {
   .header {
     padding: 6px 14px;
     height: 54px;
-    background: var(--glass-bg) !important;
-    backdrop-filter: var(--glass-blur-lg) !important;
-    -webkit-backdrop-filter: var(--glass-blur-lg) !important;
+    /* Fully opaque solid base + heavy blur — prevents scroll bleed-through on mobile */
+    background: var(--bg-tertiary) !important;
+    backdrop-filter: blur(40px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
     border-bottom: 1px solid var(--glass-border) !important;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.25) !important;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.35), 0 1px 0 var(--glass-border) !important;
   }
 
   .header__logo {
@@ -2757,16 +2758,17 @@ body {
     left: 0;
     right: 0;
     height: 72px;
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur-lg);
-    -webkit-backdrop-filter: var(--glass-blur-lg);
+    /* Fully opaque solid base + heavy blur — prevents scroll bleed-through on mobile */
+    background: var(--bg-tertiary);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
     border-top: 1px solid var(--glass-border);
     display: flex;
     justify-content: space-around;
     align-items: center;
     padding-bottom: env(safe-area-inset-bottom);
     z-index: 200;
-    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4), 0 -1px 0 var(--glass-border);
   }
 
   .bottom-nav__item {
@@ -2840,6 +2842,16 @@ body {
 
   .bottom-nav__fab:active {
     transform: scale(0.94);
+  }
+
+  /* ── Mobile: Sticky Date Header — solid background to prevent scroll bleed ── */
+  .txn-card-date-header {
+    /* Fully opaque solid base + heavy blur — prevents scroll bleed-through on mobile */
+    background: var(--bg-tertiary) !important;
+    backdrop-filter: blur(40px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25), 0 1px 0 var(--glass-border) !important;
+    border: 1px solid var(--glass-border) !important;
   }
 
   /* ── Responsive Visibility Toggles ── */
