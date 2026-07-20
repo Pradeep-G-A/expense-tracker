@@ -2085,9 +2085,38 @@ body {
   font-weight: 700;
 }
 
-.stats-summary__card span {
+.stats-amount {
   font-size: 2.2rem;
   font-weight: 800;
+}
+
+.stats-amount-suffix {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.stats-summary__card--merged {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 12px;
+}
+
+.stats-merged-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.stats-merged-divider {
+  width: 1px;
+  background: var(--glass-border);
+  height: 60px;
 }
 
 .stats-charts {
@@ -3391,6 +3420,19 @@ body {
     -webkit-backdrop-filter: var(--glass-blur) !important;
     border: 1px solid var(--glass-border) !important;
     box-shadow: var(--glass-shadow) !important;
+  }
+
+  .stats-summary__card {
+    padding: 16px !important;
+    gap: 4px !important;
+  }
+
+  .stats-summary__card h4 {
+    font-size: 0.65rem !important;
+  }
+
+  .stats-amount {
+    font-size: 1.6rem !important;
   }
 
   .stats-chart-container {
