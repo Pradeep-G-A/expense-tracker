@@ -246,6 +246,39 @@ body {
   color: var(--text-secondary);
 }
 
+/* ── Skeleton Loading ──────────────────────────────────────── */
+.skeleton {
+  background: var(--surface-elevated);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.04) 20%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 80%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+
+[data-theme="light"] .skeleton {
+  background-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.02) 20%,
+    rgba(0, 0, 0, 0.05) 50%,
+    rgba(0, 0, 0, 0.02) 80%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 /* ── Glass Mixin (applied via classes) ───────────────────── */
 .glass {
   background: var(--glass-bg);
@@ -3569,6 +3602,7 @@ body {
 
 .settings-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 20px 22px; box-shadow: var(--glass-shadow); display: flex; flex-direction: column; gap: 14px; transition: box-shadow var(--transition-smooth); }
 .settings-card:hover { box-shadow: var(--glass-shadow-hover); }
+.settings-ledger-card { flex-direction: row; align-items: center; justify-content: space-between; }
 .settings-card__header { display: flex; align-items: center; gap: 10px; color: var(--primary); }
 .settings-card__header h3 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary); }
 .settings-card__desc { margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; }
@@ -3608,6 +3642,7 @@ body {
 .settings-theme-selector { display: flex; gap: 8px; }
 .settings-theme-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 10px; background: var(--surface-flat); border: 1px solid var(--glass-border); border-radius: var(--radius-md); font-size: 0.82rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all var(--transition); }
 .settings-theme-btn--active { background: var(--primary); border-color: var(--primary); color: var(--bg-primary); }
+
 .settings-theme-btn:hover:not(.settings-theme-btn--active) { border-color: var(--primary); color: var(--primary); }
 .settings-select { background: var(--bg-main); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); color: var(--text-primary); padding: 9px 12px; font-size: 0.88rem; outline: none; cursor: pointer; transition: border-color var(--transition); width: 100%; max-width: 280px; }
 .settings-select:focus { border-color: var(--primary); }
@@ -3616,6 +3651,8 @@ body {
 @media (max-width: 640px) {
   .settings-view { padding: 12px; gap: 12px; }
   .settings-card { padding: 14px 16px; }
+  .settings-ledger-card { flex-direction: column; align-items: stretch; gap: 16px; text-align: center; }
+  .settings-ledger-card .settings-card__header { justify-content: center; }
   .settings-balance-row { flex-direction: column; align-items: stretch; }
   .settings-balance-inputs { flex-direction: column; }
   .settings-save-btn { width: 100%; justify-content: center; }

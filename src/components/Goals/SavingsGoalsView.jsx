@@ -3,6 +3,7 @@ import { Target, Plus, Trash2, Calendar } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 import { supabase } from '../../supabaseClient';
 import { DEFAULT_CHIP_AMOUNTS } from '../../utils/constants';
+import Skeleton from '../common/Skeleton';
 
 export default function SavingsGoalsView({ accounts, onAddTransaction, chipAmounts }) {
   const chips = chipAmounts && chipAmounts.length > 0 ? chipAmounts : DEFAULT_CHIP_AMOUNTS;
@@ -170,9 +171,32 @@ export default function SavingsGoalsView({ accounts, onAddTransaction, chipAmoun
 
   if (loading && goals.length === 0) {
     return (
-      <div className="table-loading">
-        <div className="spinner spinner--lg" />
-        <p>Loading savings goals...</p>
+      <div className="goals-view">
+        <div className="stats-summary">
+          <Skeleton height="100px" borderRadius="18px" />
+        </div>
+        <div className="goals-grid">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="goal-card">
+              <div className="goal-card__header">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Skeleton height="40px" width="40px" borderRadius="10px" />
+                  <div>
+                    <Skeleton height="16px" width="120px" style={{ marginBottom: '6px' }} />
+                    <Skeleton height="12px" width="80px" />
+                  </div>
+                </div>
+              </div>
+              <div className="goal-progress-container" style={{ margin: '20px 0' }}>
+                <Skeleton height="10px" borderRadius="5px" />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
+                <Skeleton height="24px" width="100px" borderRadius="12px" />
+                <Skeleton height="24px" width="100px" borderRadius="12px" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

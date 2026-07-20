@@ -274,6 +274,7 @@ function AppContent() {
               filters={filters}
               onFilterChange={setFilters}
               onNavigate={() => setActiveTab('transactions')}
+              loading={txnLoading}
             />
           </>
         )}
@@ -287,8 +288,10 @@ function AppContent() {
             accounts={accounts}
             transactions={transactions}
             activeLedger={activeLedger}
+            onToggleLedger={() => setActiveLedger(prev => prev === 1 ? 2 : 1)}
             settings={settings}
             onSignOut={signOut}
+            loading={accLoading}
           />
         )}
       </main>

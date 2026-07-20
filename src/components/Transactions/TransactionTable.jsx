@@ -4,6 +4,7 @@ import TransactionCard from './TransactionCard';
 import TransactionModal from './TransactionModal';
 import { Receipt, CreditCard, Building2, WalletCards } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
+import Skeleton from '../common/Skeleton';
 
 const ACCOUNT_ICONS = {
   HDFC: CreditCard,
@@ -117,10 +118,66 @@ export default function TransactionTable({
 
   if (loading) {
     return (
-      <div className="table-wrapper">
-        <div className="table-loading">
-          <div className="spinner spinner--lg" />
-          <p>Loading transactions...</p>
+      <div className="table-section">
+        <div className="table-section__header">
+          <h2 className="section-title">
+            <Receipt size={20} />
+            Transactions
+          </h2>
+        </div>
+        <div className="table-wrapper">
+          <table className="txn-table">
+            <thead>
+              <tr>
+                <th>Date / Time</th>
+                <th>Note</th>
+                <th>Category</th>
+                <th>Account</th>
+                <th className="text-right">Amount</th>
+                <th className="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[1, 2, 3, 4, 5].map(i => (
+                <tr key={i} className="txn-row">
+                  <td>
+                    <Skeleton height="14px" width="70%" style={{ marginBottom: '6px' }} />
+                    <Skeleton height="10px" width="40%" />
+                  </td>
+                  <td><Skeleton height="14px" width="80%" /></td>
+                  <td><Skeleton height="24px" width="80px" borderRadius="12px" /></td>
+                  <td><Skeleton height="14px" width="60px" /></td>
+                  <td className="text-right"><Skeleton height="16px" width="70px" style={{ marginLeft: 'auto' }} /></td>
+                  <td className="text-right">
+                    <Skeleton height="28px" width="28px" borderRadius="6px" style={{ display: 'inline-block', marginRight: '4px' }} />
+                    <Skeleton height="28px" width="28px" borderRadius="6px" style={{ display: 'inline-block' }} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        <div className="txn-cards">
+          {[1, 2, 3, 4, 5].map(i => (
+            <div key={i} className="txn-card">
+              <div className="txn-card__header">
+                <Skeleton height="14px" width="40%" />
+                <Skeleton height="16px" width="30%" />
+              </div>
+              <div className="txn-card__body">
+                <Skeleton height="24px" width="80px" borderRadius="12px" />
+                <Skeleton height="14px" width="60%" />
+              </div>
+              <div className="txn-card__footer">
+                <Skeleton height="12px" width="30%" />
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <Skeleton height="28px" width="28px" borderRadius="6px" />
+                  <Skeleton height="28px" width="28px" borderRadius="6px" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );

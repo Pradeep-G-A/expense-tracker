@@ -12,6 +12,7 @@ import {
   CartesianGrid
 } from 'recharts';
 import { formatCurrency } from '../../utils/formatters';
+import Skeleton from '../common/Skeleton';
 
 const COLORS = ['#6366f1', '#ec4899', '#14b8a6', '#f59e0b', '#8b5cf6', '#ef4444', '#10b981', '#3b82f6'];
 
@@ -51,7 +52,7 @@ const getPresets = () => {
   ];
 };
 
-export default function StatisticsView({ transactions, filters, onFilterChange, onNavigate }) {
+export default function StatisticsView({ transactions, filters, onFilterChange, onNavigate, loading }) {
   const [showCustomPicker, setShowCustomPicker] = useState(false);
   const [hoveredBarIndex, setHoveredBarIndex] = useState(null);
   const presets = useMemo(() => getPresets(), []);
@@ -164,6 +165,33 @@ export default function StatisticsView({ transactions, filters, onFilterChange, 
     ? expensesByCategory.find(e => e.name === activeCategory)?.value || 0
     : totalExpense;
   const donutCenterLabel = activeCategory || 'Total Spent';
+
+  if (loading) {
+    return (
+      <div className="statistics-view">
+        <div className="stats-date-presets-wrapper">
+          <Skeleton height="40px" borderRadius="20px" />
+        </div>
+        <div className="stats-chart-container">
+          <Skeleton height="24px" width="200px" style={{ marginBottom: '16px' }} />
+          <Skeleton height="20px" width="300px" style={{ marginBottom: '24px' }} />
+          <div className="chart-wrapper pie-chart-layout">
+            <div className="pie-container">
+              <Skeleton height="280px" borderRadius="16px" />
+            </div>
+            <div className="pie-legend">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <Skeleton height="20px" width="120px" />
+                  <Skeleton height="20px" width="60px" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="statistics-view">

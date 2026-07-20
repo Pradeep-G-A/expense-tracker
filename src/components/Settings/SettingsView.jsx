@@ -7,6 +7,7 @@ import {
 import { supabase } from '../../supabaseClient';
 import { CURRENCIES, CATEGORIES } from '../../utils/constants';
 import { INCOME_CATEGORIES } from '../../utils/constants';
+import Skeleton from '../common/Skeleton';
 
 const THEME_OPTIONS = [
   { value: 'dark', label: 'Dark', icon: Moon },
@@ -18,8 +19,10 @@ export default function SettingsView({
   accounts,
   transactions,
   activeLedger,
+  onToggleLedger,
   settings,
   onSignOut,
+  loading,
 }) {
   const {
     currency, setCurrency,
@@ -114,6 +117,22 @@ export default function SettingsView({
         <Settings size={22} /> Settings & Preferences
       </h2>
 
+      {/* ── 0. ACTIVE LEDGER ── */}
+      <div className="settings-card settings-ledger-card">
+        <div>
+          <div className="settings-card__header" style={{ marginBottom: '4px' }}>
+            <Database size={18} />
+            <h3 style={{ margin: 0 }}>Active Ledger</h3>
+          </div>
+          <p className="settings-card__desc" style={{ margin: 0 }}>
+            Currently viewing Ledger {activeLedger}
+          </p>
+        </div>
+        <button className="settings-save-btn" onClick={onToggleLedger}>
+          Switch to Ledger {activeLedger === 1 ? 2 : 1}
+        </button>
+      </div>
+
       {/* ── 1. ACCOUNT BALANCE EDITOR ── */}
       <div className="settings-card">
         <div className="settings-card__header">
@@ -123,13 +142,20 @@ export default function SettingsView({
         <p className="settings-card__desc">
           Set the opening balance for each account per ledger. This is the baseline for your running balance calculations.
         </p>
-        <button
-          className="settings-export-btn"
-          onClick={() => setIsBalanceModalOpen(true)}
-        >
-          <Edit2 size={16} />
-          Edit Balances
-        </button>
+        
+        {loading ? (
+          <div style={{ marginTop: '12px' }}>
+            <Skeleton height="36px" width="100%" borderRadius="8px" />
+          </div>
+        ) : (
+          <button
+            className="settings-export-btn"
+            onClick={() => setIsBalanceModalOpen(true)}
+          >
+            <Edit2 size={16} />
+            Edit Balances
+          </button>
+        )}
 
         {isBalanceModalOpen && createPortal(
           <div className="modal-overlay" onClick={() => setIsBalanceModalOpen(false)}>
