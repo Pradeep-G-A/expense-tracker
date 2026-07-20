@@ -4,6 +4,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { useAuth } from './hooks/useAuth';
 import { useTransactions } from './hooks/useTransactions';
 import { useAccounts } from './hooks/useAccounts';
+import { useSettings } from './hooks/useSettings';
 import LoginForm from './components/Auth/LoginForm';
 import Header from './components/Layout/Header';
 import AccountCards from './components/Accounts/AccountCards';
@@ -12,6 +13,7 @@ import TransactionTable from './components/Transactions/TransactionTable';
 import StatisticsView from './components/Statistics/StatisticsView';
 import FilterBar from './components/Transactions/FilterBar';
 import SavingsGoalsView from './components/Goals/SavingsGoalsView';
+import SettingsView from './components/Settings/SettingsView';
 import Toast from './components/common/Toast';
 
 function AppContent() {
@@ -27,6 +29,7 @@ function AppContent() {
     reorderTransactions,
   } = useTransactions(user);
   const { accounts, loading: accLoading } = useAccounts(transactions, user);
+  const settings = useSettings();
 
   const [activeLedger, setActiveLedger] = useState(1);
   const [activeTab, setActiveTab] = useState(() => {
@@ -58,12 +61,13 @@ function AppContent() {
         activeEl.isContentEditable
       );
 
-      // 1. Tab Switching (Alt + 1 / Alt + 2 / Alt + 3)
-      if (e.altKey && (e.key === '1' || e.key === '2' || e.key === '3')) {
+      // 1. Tab Switching (Alt + 1 / Alt + 2 / Alt + 3 / Alt + 4)
+      if (e.altKey && (e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4')) {
         e.preventDefault();
         if (e.key === '1') setActiveTab('transactions');
         if (e.key === '2') setActiveTab('statistics');
         if (e.key === '3') setActiveTab('goals');
+        if (e.key === '4') setActiveTab('settings');
         return;
       }
 
@@ -223,6 +227,13 @@ function AppContent() {
           >
             Savings Goals
           </button>
+          <button 
+            className={`tab-btn ${activeTab === 'settings' ? 'tab-btn--active' : ''}`}
+            onClick={() => setActiveTab('settings')}
+            title="Shortcut: Alt+4"
+          >
+            Settings
+          </button>
         </div>
 
         {activeTab === 'transactions' && (
@@ -230,7 +241,7 @@ function AppContent() {
             <AccountCards accounts={accounts} loading={accLoading} txnLoading={txnLoading} activeLedger={activeLedger} transactions={transactions} />
             
             <div className="transaction-form-desktop">
-              <TransactionForm accounts={accounts} onAdd={handleAdd} />
+              <TransactionForm accounts={accounts} onAdd={handleAdd} visibleCategories={settings.visibleCategories} />
             </div>
 
             <FilterBar
@@ -268,43 +279,17 @@ function AppContent() {
         )}
 
         {activeTab === 'goals' && (
-          <SavingsGoalsView accounts={accounts} onAddTransaction={handleAdd} />
+          <SavingsGoalsView accounts={accounts} onAddTransaction={handleAdd} chipAmounts={settings.chipAmounts} />
         )}
 
         {activeTab === 'settings' && (
-          <div className="settings-view" style={{ padding: '20px', paddingBottom: '40px' }}>
-            <h2 className="section-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Settings size={24} /> Settings & Profile
-            </h2>
-            
-            <div className="settings-section" style={{ background: 'var(--bg-card)', padding: '20px', borderRadius: '16px', marginBottom: '32px', border: '1px solid var(--border-color)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-              <h3 style={{ marginTop: 0, marginBottom: '16px', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Active Ledger</h3>
-              <div className="ledger-toggle-wrapper" style={{ display: 'flex', width: '100%' }}>
-                <button 
-                  className={`ledger-toggle-btn ${activeLedger === 1 ? 'ledger-toggle-btn--active' : ''}`}
-                  onClick={() => setActiveLedger(1)}
-                  style={{ flex: 1, padding: '12px', fontSize: '1rem' }}
-                >
-                  Ledger 1
-                </button>
-                <button 
-                  className={`ledger-toggle-btn ${activeLedger === 2 ? 'ledger-toggle-btn--active' : ''}`}
-                  onClick={() => setActiveLedger(2)}
-                  style={{ flex: 1, padding: '12px', fontSize: '1rem' }}
-                >
-                  Ledger 2
-                </button>
-              </div>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '12px', marginBottom: 0 }}>
-                Switching ledgers dynamically updates all balances and transaction history across the app.
-              </p>
-            </div>
-
-            <h2 className="section-title" style={{ marginBottom: '16px' }}>Dashboard Summary</h2>
-            <div className="settings-dashboard-override">
-              <AccountCards accounts={accounts} loading={accLoading} txnLoading={txnLoading} activeLedger={activeLedger} transactions={transactions} />
-            </div>
-          </div>
+          <SettingsView
+            accounts={accounts}
+            transactions={transactions}
+            activeLedger={activeLedger}
+            settings={settings}
+            onSignOut={signOut}
+          />
         )}
       </main>
 
@@ -315,7 +300,7 @@ function AppContent() {
             <button className="modal-close" onClick={() => setIsModalOpen(false)}>
               <X size={20} />
             </button>
-            <TransactionForm accounts={accounts} onAdd={(data) => {
+            <TransactionForm accounts={accounts} visibleCategories={settings.visibleCategories} onAdd={(data) => {
               handleAdd(data);
               setIsModalOpen(false);
             }} />

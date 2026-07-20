@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { Target, Plus, Trash2, Calendar } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 import { supabase } from '../../supabaseClient';
+import { DEFAULT_CHIP_AMOUNTS } from '../../utils/constants';
 
-export default function SavingsGoalsView({ accounts, onAddTransaction }) {
+export default function SavingsGoalsView({ accounts, onAddTransaction, chipAmounts }) {
+  const chips = chipAmounts && chipAmounts.length > 0 ? chipAmounts : DEFAULT_CHIP_AMOUNTS;
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -358,10 +360,16 @@ export default function SavingsGoalsView({ accounts, onAddTransaction }) {
                 {/* Quick Add Chips */}
                 <div className="goal-quick-chips">
                   <span className="quick-chip-label">Quick Save:</span>
-                  <button type="button" className="quick-chip" onClick={() => handleAdjustSavings(goal, true, 100)}>+ ₹100</button>
-                  <button type="button" className="quick-chip" onClick={() => handleAdjustSavings(goal, true, 500)}>+ ₹500</button>
-                  <button type="button" className="quick-chip" onClick={() => handleAdjustSavings(goal, true, 1000)}>+ ₹1k</button>
-                  <button type="button" className="quick-chip" onClick={() => handleAdjustSavings(goal, true, 5000)}>+ ₹5k</button>
+                  {chips.map(amt => (
+                    <button
+                      key={amt}
+                      type="button"
+                      className="quick-chip"
+                      onClick={() => handleAdjustSavings(goal, true, amt)}
+                    >
+                      + {amt >= 1000 ? `₹${amt / 1000}k` : `₹${amt}`}
+                    </button>
+                  ))}
                 </div>
 
                 <div className="goal-adjust-row">

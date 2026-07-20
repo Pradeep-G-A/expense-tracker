@@ -1,7 +1,9 @@
 export function formatCurrency(amount) {
-  return new Intl.NumberFormat('en-IN', {
+  const currencyCode = localStorage.getItem('app_currency') || 'INR';
+  const localeMap = { INR: 'en-IN', USD: 'en-US', EUR: 'de-DE', GBP: 'en-GB' };
+  return new Intl.NumberFormat(localeMap[currencyCode] || 'en-IN', {
     style: 'currency',
-    currency: 'INR',
+    currency: currencyCode,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);

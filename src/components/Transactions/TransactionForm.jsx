@@ -13,7 +13,8 @@ const DEFAULT_TEMPLATES = [
   { name: '🍽️ Lunch', amount: 120, category: 'Food & Dining', account: 'HDFC', note: 'Lunch' }
 ];
 
-export default function TransactionForm({ accounts, onAdd }) {
+export default function TransactionForm({ accounts, onAdd, visibleCategories }) {
+  const activeCategories = visibleCategories && visibleCategories.length > 0 ? visibleCategories : CATEGORIES;
   const [isExpense, setIsExpense] = useState(true);
   const [form, setForm] = useState({
     amount: '',
@@ -306,7 +307,7 @@ export default function TransactionForm({ accounts, onAdd }) {
               onChange={e => handleChange('category', e.target.value)}
               required
             >
-              {CATEGORIES.map(cat => (
+              {activeCategories.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
