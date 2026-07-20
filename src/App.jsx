@@ -29,7 +29,13 @@ function AppContent() {
   const { accounts, loading: accLoading } = useAccounts(transactions, user);
 
   const [activeLedger, setActiveLedger] = useState(1);
-  const [activeTab, setActiveTab] = useState('transactions');
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('expenseTracker_activeTab') || 'transactions';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('expenseTracker_activeTab', activeTab);
+  }, [activeTab]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [filters, setFilters] = useState({
