@@ -181,13 +181,13 @@ export default function SavingsGoalsView({ accounts, onAddTransaction }) {
       <div className="stats-summary">
         <div className="stats-summary__card stats-summary__card--merged">
           <div className="stats-merged-column">
-            <h4>Total Goal Savings</h4>
+            <h5>Total Goal Savings</h5>
             <span className="stats-amount text-positive">{formatCurrency(totalSaved)}</span>
             <span className="summary-card-sub">of <b>{formatCurrency(totalTarget)}</b> target ({overallPercentage}%)</span>
           </div>
           <div className="stats-merged-divider"></div>
           <div className="stats-merged-column">
-            <h4>Monthly Contribution</h4>
+            <h5>Monthly Contribution</h5>
             <span className="stats-amount text-primary-color" style={{ color: 'var(--primary)' }}>
               {formatCurrency(totalMonthlyCommitment)} <span className="stats-amount-suffix">/ mo</span>
             </span>

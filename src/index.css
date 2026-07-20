@@ -2076,9 +2076,9 @@ body {
   border-color: var(--glass-border-hover);
 }
 
-.stats-summary__card h4 {
+.stats-summary__card h5 {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   text-transform: uppercase;
   color: var(--text-muted);
   letter-spacing: 0.1em;
@@ -2088,6 +2088,7 @@ body {
 .stats-amount {
   font-size: 2.2rem;
   font-weight: 800;
+  white-space: nowrap;
 }
 
 .stats-amount-suffix {
@@ -2099,7 +2100,7 @@ body {
 .stats-summary__card--merged {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   flex-wrap: nowrap;
   gap: 12px;
@@ -2108,7 +2109,7 @@ body {
 .stats-merged-column {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   flex: 1;
   min-width: 0;
 }
@@ -3427,12 +3428,16 @@ body {
     gap: 4px !important;
   }
 
-  .stats-summary__card h4 {
-    font-size: 0.65rem !important;
+  .stats-summary__card h5 {
+    font-size: 0.58rem !important;
   }
 
   .stats-amount {
-    font-size: 1.6rem !important;
+    font-size: 1.25rem !important;
+  }
+
+  .stats-amount-suffix {
+    font-size: 0.85rem !important;
   }
 
   .stats-chart-container {
