@@ -3310,6 +3310,29 @@ body {
     box-shadow: var(--glass-shadow) !important;
   }
 
+  .stats-chart-container {
+    padding: 16px 12px !important;
+  }
+
+  /* ── Stats Table Mobile Adjustments ── */
+  .daily-spending-table th,
+  .daily-spending-table td {
+    padding: 8px 10px !important;
+  }
+
+  .td--date-cell {
+    width: auto !important;
+  }
+
+  .td--date-text {
+    font-size: 0.72rem !important;
+    padding: 2px 6px !important;
+  }
+
+  .daily-spending-table .td--amount {
+    font-size: 0.85rem !important;
+  }
+
   .settings-section {
     background: var(--glass-bg) !important;
     backdrop-filter: var(--glass-blur) !important;
