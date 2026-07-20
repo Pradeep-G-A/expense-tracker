@@ -2666,60 +2666,84 @@ body {
   margin-top: 4px;
 }
 
-.goal-progress-section {
+.goal-progress-layout {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 0;
+}
+
+.goal-ring-wrapper {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+}
+
+.circular-chart {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.circular-bg {
+  fill: none;
+  stroke: var(--surface-flat);
+  stroke-width: 2.5;
+}
+
+.circular-fill {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: stroke-dasharray 1s ease-out;
+  filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.4));
+}
+
+.goal-ring-content {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goal-ring-percent {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.goal-stats-column {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  flex: 1;
 }
 
-.goal-progress-meta {
+.goal-stat-main {
   display: flex;
-  justify-content: space-between;
-  font-size: 0.78rem;
+  flex-direction: column;
+  line-height: 1.2;
 }
 
-.goal-progress-percent {
-  font-weight: 700;
+.goal-stat-main strong {
+  font-size: 1.15rem;
   color: var(--primary);
+  font-weight: 800;
 }
 
-.goal-progress-numbers { color: var(--text-secondary); }
-
-.flat-progress-bar {
-  height: 8px;
-  background: var(--surface-flat);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-}
-
-.flat-progress-bar__fill {
-  height: 100%;
-  background: var(--primary);
-  border-radius: var(--radius-full);
-  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.flat-progress-bar__fill::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-  animation: progressSheen 2s ease-in-out infinite;
-}
-
-@keyframes progressSheen {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(100%); }
+.goal-stat-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
 .goal-details-row {
   display: flex;
-  justify-content: space-between;
-  border-top: 1px solid var(--glass-border);
-  padding-top: 12px;
+  gap: 16px;
+  margin-top: 2px;
 }
 
 .goal-detail-item {
@@ -2729,25 +2753,84 @@ body {
 }
 
 .goal-detail-label {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--text-muted);
   text-transform: uppercase;
   font-weight: 600;
 }
 
 .goal-detail-value {
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .goal-card__actions {
   display: flex;
+  flex-direction: column;
   gap: 10px;
-  align-items: center;
   border-top: 1px solid var(--glass-border);
   padding-top: 12px;
   margin-top: auto;
+}
+
+.goal-quick-chips {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+
+.quick-chip-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.quick-chip {
+  background: var(--surface-flat);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.quick-chip:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+.goal-adjust-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.goal-ledger-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-flat);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border);
+}
+
+.goal-account-select {
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  outline: none;
 }
 
 .goal-adjust-input-wrapper {

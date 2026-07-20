@@ -20,7 +20,7 @@ export default function TransactionForm({ accounts, onAdd }) {
     category: CATEGORIES[0],
     account: 'HDFC',
     date: getTodayStr(),
-    time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+    time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
     note: '',
   });
   const [submitting, setSubmitting] = useState(false);
@@ -144,7 +144,7 @@ export default function TransactionForm({ accounts, onAdd }) {
         category: CATEGORIES[0],
         account: form.account,
         date: getTodayStr(),
-        time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+        time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         note: '',
       });
     } catch (err) {

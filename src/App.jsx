@@ -262,7 +262,7 @@ function AppContent() {
         )}
 
         {activeTab === 'goals' && (
-          <SavingsGoalsView />
+          <SavingsGoalsView accounts={accounts} onAddTransaction={handleAdd} />
         )}
 
         {activeTab === 'settings' && (

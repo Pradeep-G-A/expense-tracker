@@ -134,6 +134,7 @@ export function useTransactions(user) {
       time: transaction.time || null,
       note: transaction.note || null,
       sort_order: maxSortOrder + 1,
+      linked_goal_id: transaction.linked_goal_id || null,
     };
 
     if (!navigator.onLine) {
@@ -174,6 +175,7 @@ export function useTransactions(user) {
       return;
     }
 
+    const oldTxn = transactions.find(t => t.id === id);
     const cleanUpdates = { ...updates };
     if (cleanUpdates.amount !== undefined) {
       cleanUpdates.amount = Number(cleanUpdates.amount);
@@ -191,6 +193,29 @@ export function useTransactions(user) {
       throw error;
     }
 
+    // Bidirectional Sync: If transaction was linked and amount changed
+    if (oldTxn && oldTxn.linked_goal_id && cleanUpdates.amount !== undefined && oldTxn.amount !== cleanUpdates.amount) {
+      try {
+        const { data: goalData } = await supabase
+          .from('savings_goals')
+          .select('*')
+          .eq('id', oldTxn.linked_goal_id)
+          .single();
+
+        if (goalData) {
+          const amountDiff = cleanUpdates.amount - oldTxn.amount;
+          const newAmt = Math.max(0, goalData.current_amount - amountDiff);
+          
+          await supabase
+            .from('savings_goals')
+            .update({ current_amount: newAmt })
+            .eq('id', goalData.id);
+        }
+      } catch (syncErr) {
+         console.error('Error syncing goal after transaction update:', syncErr);
+      }
+    }
+
     await fetchTransactions();
     return data;
   };
@@ -203,6 +228,8 @@ export function useTransactions(user) {
       return;
     }
 
+    const txnToDelete = transactions.find(t => t.id === id);
+
     const { error } = await supabase
       .from('transactions')
       .delete()
@@ -211,6 +238,31 @@ export function useTransactions(user) {
     if (error) {
       console.error('Error deleting transaction:', error);
       throw error;
+    }
+
+    // Bidirectional Sync: If we deleted a transaction linked to a goal, reverse the amount
+    if (txnToDelete && txnToDelete.linked_goal_id) {
+      try {
+        const { data: goalData } = await supabase
+          .from('savings_goals')
+          .select('*')
+          .eq('id', txnToDelete.linked_goal_id)
+          .single();
+
+        if (goalData) {
+          // If transaction amount was -500 (expense), we had originally ADDED 500 to the goal.
+          // By reversing it, we need to subtract 500 from the goal.
+          // math: current_amount + txnToDelete.amount
+          // e.g. 1000 + (-500) = 500
+          const newAmt = Math.max(0, goalData.current_amount + txnToDelete.amount);
+          await supabase
+            .from('savings_goals')
+            .update({ current_amount: newAmt })
+            .eq('id', goalData.id);
+        }
+      } catch (syncErr) {
+        console.error('Error syncing goal after transaction deletion:', syncErr);
+      }
     }
 
     await fetchTransactions();

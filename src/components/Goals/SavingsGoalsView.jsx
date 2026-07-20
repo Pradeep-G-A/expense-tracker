@@ -3,7 +3,7 @@ import { Target, Plus, Trash2, Calendar } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 import { supabase } from '../../supabaseClient';
 
-export default function SavingsGoalsView() {
+export default function SavingsGoalsView({ accounts, onAddTransaction }) {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -17,6 +17,18 @@ export default function SavingsGoalsView() {
 
   // Track deposit/withdrawal inputs per goal
   const [adjustments, setAdjustments] = useState({});
+  // Track ledger linking options per goal
+  const [linkOptions, setLinkOptions] = useState({});
+
+  const handleLinkChange = (id, field, value) => {
+    setLinkOptions(prev => ({
+      ...prev,
+      [id]: {
+        ...(prev[id] || { linked: false, account: accounts?.[0]?.name || 'HDFC' }),
+        [field]: value
+      }
+    }));
+  };
 
   const fetchGoals = async () => {
     setLoading(true);
@@ -95,13 +107,35 @@ export default function SavingsGoalsView() {
     }
   };
 
-  const handleAdjustSavings = async (goal, isDeposit) => {
-    const amtStr = adjustments[goal.id] || '';
+  const handleAdjustSavings = async (goal, isDeposit, overrideAmt = null) => {
+    const amtStr = overrideAmt !== null ? String(overrideAmt) : (adjustments[goal.id] || '');
     const amt = Number(amtStr);
     if (!amtStr || isNaN(amt) || amt <= 0) return;
 
     const factor = isDeposit ? 1 : -1;
     const newAmt = Math.max(0, Math.min(goal.target_amount, goal.current_amount + (amt * factor)));
+    const actualChange = newAmt - goal.current_amount;
+
+    if (actualChange === 0) return;
+
+    // Optional Ledger Link
+    const linkState = linkOptions[goal.id] || {};
+    if (linkState.linked && onAddTransaction) {
+       const ledgerAmount = isDeposit ? -Math.abs(actualChange) : Math.abs(actualChange);
+       try {
+         await onAddTransaction({
+           amount: ledgerAmount,
+           category: 'Savings & Investments',
+           account: linkState.account || accounts?.[0]?.name || 'HDFC',
+           date: new Date().toISOString().split('T')[0],
+           time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+           note: `${isDeposit ? 'Transfer to' : 'Withdrawal from'} Goal: ${goal.name}`,
+           linked_goal_id: goal.id,
+         });
+       } catch (err) {
+         console.error('Failed to log transaction to ledger', err);
+       }
+    }
 
     try {
       const { error } = await supabase
@@ -267,66 +301,116 @@ export default function SavingsGoalsView() {
                 </button>
               </div>
 
-              {/* Progress Tracker */}
-              <div className="goal-progress-section">
-                <div className="goal-progress-meta">
-                  <span className="goal-progress-percent">{pct}% Saved</span>
-                  <span className="goal-progress-numbers">
-                    <strong>{formatCurrency(goal.current_amount)}</strong> of {formatCurrency(goal.target_amount)}
-                  </span>
-                </div>
-                <div className="flat-progress-bar">
-                  <div
-                    className="flat-progress-bar__fill"
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Extra Details */}
-              <div className="goal-details-row">
-                {Number(goal.monthly_target || 0) > 0 && (
-                  <div className="goal-detail-item">
-                    <span className="goal-detail-label">Monthly Target</span>
-                    <span className="goal-detail-value">{formatCurrency(goal.monthly_target)}</span>
+              {/* Circular Progress & Details Layout */}
+              <div className="goal-progress-layout">
+                <div className="goal-ring-wrapper">
+                  <svg className="circular-chart" viewBox="0 0 36 36">
+                    <path
+                      className="circular-bg"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      className="circular-fill"
+                      strokeDasharray={`${pct}, 100`}
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  </svg>
+                  <div className="goal-ring-content">
+                    <span className="goal-ring-percent">{pct}%</span>
                   </div>
-                )}
-                <div className="goal-detail-item">
-                  <span className="goal-detail-label">Remaining</span>
-                  <span className="goal-detail-value text-negative">
-                    {formatCurrency(Math.max(0, Number(goal.target_amount || 0) - Number(goal.current_amount || 0)))}
-                  </span>
+                </div>
+
+                <div className="goal-stats-column">
+                  <div className="goal-stat-main">
+                    <strong>{formatCurrency(goal.current_amount)}</strong>
+                    <span className="goal-stat-sub">of {formatCurrency(goal.target_amount)}</span>
+                  </div>
+
+                  {/* Extra Details */}
+                  <div className="goal-details-row">
+                    {Number(goal.monthly_target || 0) > 0 && (
+                      <div className="goal-detail-item">
+                        <span className="goal-detail-label">Monthly Target</span>
+                        <span className="goal-detail-value">{formatCurrency(goal.monthly_target)}</span>
+                      </div>
+                    )}
+                    <div className="goal-detail-item">
+                      <span className="goal-detail-label">Remaining</span>
+                      <span className="goal-detail-value text-negative">
+                        {formatCurrency(Math.max(0, Number(goal.target_amount || 0) - Number(goal.current_amount || 0)))}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Deposit/Withdrawal Adjustments */}
               <div className="goal-card__actions">
-                <div className="goal-adjust-input-wrapper">
-                  <span className="goal-adjust-symbol">₹</span>
-                  <input
-                    type="number"
-                    min="1"
-                    placeholder="Amount"
-                    value={adjustments[goal.id] || ''}
-                    onChange={(e) => handleAdjustmentChange(goal.id, e.target.value)}
-                    className="goal-adjust-input"
-                  />
+                {/* Quick Add Chips */}
+                <div className="goal-quick-chips">
+                  <span className="quick-chip-label">Quick Save:</span>
+                  <button type="button" className="quick-chip" onClick={() => handleAdjustSavings(goal, true, 100)}>+ ₹100</button>
+                  <button type="button" className="quick-chip" onClick={() => handleAdjustSavings(goal, true, 500)}>+ ₹500</button>
+                  <button type="button" className="quick-chip" onClick={() => handleAdjustSavings(goal, true, 1000)}>+ ₹1k</button>
+                  <button type="button" className="quick-chip" onClick={() => handleAdjustSavings(goal, true, 5000)}>+ ₹5k</button>
                 </div>
-                <div className="goal-adjust-buttons">
-                  <button
-                    className="btn btn--sm btn--primary"
-                    onClick={() => handleAdjustSavings(goal, true)}
-                    disabled={!adjustments[goal.id]}
-                  >
-                    Save
-                  </button>
-                  <button
-                    className="btn btn--sm btn--ghost"
-                    onClick={() => handleAdjustSavings(goal, false)}
-                    disabled={!adjustments[goal.id]}
-                  >
-                    Withdraw
-                  </button>
+
+                <div className="goal-adjust-row">
+                  <div className="goal-adjust-input-wrapper">
+                    <span className="goal-adjust-symbol">₹</span>
+                    <input
+                      type="number"
+                      min="1"
+                      placeholder="Amount"
+                      value={adjustments[goal.id] || ''}
+                      onChange={(e) => handleAdjustmentChange(goal.id, e.target.value)}
+                      className="goal-adjust-input"
+                    />
+                  </div>
+                  <div className="goal-adjust-buttons">
+                    <button
+                      className="btn btn--sm btn--primary"
+                      onClick={() => handleAdjustSavings(goal, true)}
+                      disabled={!adjustments[goal.id]}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className="btn btn--sm btn--ghost"
+                      onClick={() => handleAdjustSavings(goal, false)}
+                      disabled={!adjustments[goal.id]}
+                    >
+                      Withdraw
+                    </button>
+                  </div>
+                </div>
+
+                {/* Link to Ledger Toggle */}
+                <div className="goal-ledger-link">
+                  <label className="checkbox-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                    <input 
+                      type="checkbox"
+                      checked={(linkOptions[goal.id] || {}).linked || false}
+                      onChange={(e) => handleLinkChange(goal.id, 'linked', e.target.checked)}
+                      style={{ cursor: 'pointer', accentColor: 'var(--primary)' }}
+                    />
+                    <span className="checkbox-text" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Sync with Ledger</span>
+                  </label>
+                  {(linkOptions[goal.id] || {}).linked && (
+                    <select
+                      className="goal-account-select"
+                      value={(linkOptions[goal.id] || {}).account || (accounts?.[0]?.name || 'HDFC')}
+                      onChange={(e) => handleLinkChange(goal.id, 'account', e.target.value)}
+                    >
+                      {accounts?.map(acc => (
+                        <option key={acc.name} value={acc.name}>{acc.name}</option>
+                      )) || <option value="HDFC">HDFC</option>}
+                    </select>
+                  )}
                 </div>
               </div>
             </div>

@@ -72,7 +72,9 @@ export default function TransactionTable({
       if (dateDiff !== 0) return dateDiff;
       const timeA = a.time || '00:00:00';
       const timeB = b.time || '00:00:00';
-      return timeA.localeCompare(timeB);
+      const timeDiff = timeA.localeCompare(timeB);
+      if (timeDiff !== 0) return timeDiff;
+      return (a.sort_order || 0) - (b.sort_order || 0);
     });
 
     chronologicalTxns.forEach(t => {
