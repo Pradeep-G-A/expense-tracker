@@ -191,7 +191,7 @@ html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -199,7 +199,7 @@ body {
   color: var(--text-primary);
   transition: background var(--transition), color var(--transition);
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* ── Scrollbar ──────────────────────────────────────────── */
